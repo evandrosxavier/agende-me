@@ -17,12 +17,12 @@ import java.util.Optional;
 public interface MedicoRepository extends JpaRepository<Medico, Long> {
 
     Optional<Medico> findByCrm(String crm);
-    
+
     Page<Medico> findByNomeContainingIgnoreCase(String nome, Pageable pageable);
 
     Page<Medico> findByEspecialidade(Especialidade especialidade, Pageable pageable);
 
-    Page<Medico> findByAtivoTrue(Pageable pageable);
+    Page<Medico> findAllByAtivoTrue(Pageable pageable);
 
     @Modifying
     @Transactional

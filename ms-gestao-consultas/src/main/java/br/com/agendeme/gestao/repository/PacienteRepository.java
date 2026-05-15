@@ -18,6 +18,8 @@ public interface PacienteRepository extends JpaRepository<Paciente, Long> {
 
     Page<Paciente> findByNomeContainingIgnoreCase(String nome, Pageable pageable);
 
+    Page<Paciente> findAllByAtivoTrue(Pageable pageable);
+
     @Modifying
     @Transactional
     @Query("UPDATE Paciente p SET p.ativo = false WHERE p.id = :id")
