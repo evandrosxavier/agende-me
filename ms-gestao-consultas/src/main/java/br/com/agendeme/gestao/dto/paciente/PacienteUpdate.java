@@ -1,27 +1,28 @@
 package br.com.agendeme.gestao.dto.paciente;
 
 import br.com.agendeme.gestao.dto.endereco.EnderecoRequest;
+import br.com.agendeme.gestao.model.domain.Sexo;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-// Todos os campos são opcionais — enviar apenas o que deseja alterar
 public record PacienteUpdate(
 
         @Size(max = 100, message = "Nome deve ter no máximo 100 caracteres")
         String nome,
 
+        @Size(min = 2, max = 2, message = "DDD deve ter 2 dígitos")
         @Pattern(regexp = "\\d{2}", message = "DDD deve ter 2 dígitos")
         String ddd,
 
-        @Size(min = 8, max = 20, message = "Telefone deve ter no mínimo 8 e máximo 20 caracteres")
+        @Size(min = 8, max = 9, message = "Telefone deve ter entre 8 e 9 dígitos")
+        @Pattern(regexp = "\\d{8,9}", message = "Telefone inválido")
         String telefone,
 
-        @Valid
-        EnderecoRequest endereco,
+        Sexo sexo,
 
-        @Pattern(regexp = "\\d{11}", message = "CPF deve conter 11 dígitos numéricos sem pontuação")
-        String cpf
+        @Valid
+        EnderecoRequest endereco
 ) {}
 
 

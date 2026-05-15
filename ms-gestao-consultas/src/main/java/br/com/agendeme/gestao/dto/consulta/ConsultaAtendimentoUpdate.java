@@ -5,9 +5,6 @@ import jakarta.validation.constraints.Size;
 
 
 public record ConsultaAtendimentoUpdate(
-        @NotNull(message = "Status é obrigatório")
-        StatusConsulta status,
-
         @Size(max = 255)
         String diagnostico,
 

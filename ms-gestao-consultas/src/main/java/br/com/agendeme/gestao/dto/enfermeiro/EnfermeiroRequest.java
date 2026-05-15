@@ -15,13 +15,15 @@ public record EnfermeiroRequest(
 
         @NotBlank(message = "E-mail é obrigatório")
         @Email(message = "E-mail inválido")
-        @Size(max = 100, message = "E-mail deve ter no máximo 100 caracteres")
+        @Size(max = 50, message = "E-mail deve ter no máximo 50 caracteres")
         String email,
 
+        @NotBlank(message = "DDD é obrigatório")
         @Pattern(regexp = "\\d{2}", message = "DDD deve ter 2 dígitos")
         String ddd,
 
-        @Size(min = 8, max = 20, message = "Telefone deve ter no mínimo 8 e máximo 20 caracteres")
+        @NotBlank(message = "Telefone é obrigatório")
+        @Pattern(regexp = "\\d{8,9}", message = "Telefone inválido")
         String telefone,
 
         @NotNull(message = "Sexo é obrigatório")
@@ -36,18 +38,24 @@ public record EnfermeiroRequest(
         EnderecoRequest endereco,
 
         @NotBlank(message = "Login é obrigatório")
+        @Size(min = 4, max = 10, message = "Login deve ter entre 4 e 10 caracteres")
+        @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Login deve conter apenas letras e números")
         String login,
 
         @NotBlank(message = "Senha é obrigatória")
-        @Size(min = 8, max = 255, message = "Senha deve ter entre 8 e 255 caracteres")
+        @Size(min = 8, max = 72, message = "Senha deve ter entre 8 e 72 caracteres")
+        @Pattern(
+                regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@#$!%*?&]).+$",
+                message = "Senha deve conter letra, número e caractere especial"
+        )
         String senha,
 
         @NotBlank(message = "CRE é obrigatório")
-        @Size(max = 15, message = "CRE deve ter no máximo 15 caracteres")
+        @Pattern(regexp = "\\d{4,10}", message = "CRE deve ter entre 4 e 10 dígitos")
         String cre,
 
         @NotBlank(message = "UF do CRE é obrigatória")
-        @Size(min = 2, max = 2, message = "UF do CRE deve ter exatamente 2 caracteres")
+        @Pattern(regexp = "[A-Z]{2}", message = "UF deve ter 2 letras maiúsculas")
         String creUf
 ) {}
 
