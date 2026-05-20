@@ -1,8 +1,8 @@
 package br.com.agendeme.gestao.repository;
 
 import br.com.agendeme.gestao.model.domain.ConsultaMedica;
-import br.com.agendeme.gestao.model.domain.Especialidade;
-import br.com.agendeme.gestao.model.domain.StatusConsulta;
+import br.com.agendeme.gestao.model.enums.Especialidade;
+import br.com.agendeme.gestao.model.enums.StatusConsulta;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

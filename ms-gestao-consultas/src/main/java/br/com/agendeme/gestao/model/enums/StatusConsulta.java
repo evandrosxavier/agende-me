@@ -1,4 +1,4 @@
-package br.com.agendeme.gestao.model.domain;
+package br.com.agendeme.gestao.model.enums;
 
 public enum StatusConsulta {
     AGENDADA,

@@ -1,10 +1,10 @@
-package br.com.agendeme.notificacao;
+package br.com.agendeme.gestao.model;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class MsNotificacaoApplicationTests {
+class MsGestaoConsultasApplicationTests {
 
 	@Test
 	void contextLoads() {

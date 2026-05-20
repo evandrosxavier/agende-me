@@ -1,6 +1,7 @@
 package br.com.agendeme.gestao.mapper;
 
 import br.com.agendeme.gestao.dto.consulta.*;
+import br.com.agendeme.gestao.dto.notificacao.ConsultaNotificacaoDTO;
 import br.com.agendeme.gestao.model.domain.ConsultaMedica;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
@@ -39,10 +40,20 @@ public interface ConsultaMedicaMapper {
     ConsultaAtendimentoResponse consultaRealizadaToResponseDTO(ConsultaMedica consulta);
 
 
+    @Mapping(source = "paciente.nome", target = "pacienteNome")
+    @Mapping(source = "paciente.cpf", target = "pacienteCpf")
+    @Mapping(source = "paciente.email", target = "pacienteEmail")
+    @Mapping(source = "medico.nome", target = "medicoNome")
+    @Mapping(source = "medico.crm", target = "medicoCrm")
+    @Mapping(target = "consultaId", source = "id")
+    @Mapping(target = "dataEvento", expression = "java(java.time.LocalDateTime.now().toString())")
+    ConsultaNotificacaoDTO toNotificacaoDTO(ConsultaMedica consulta);
+
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "paciente", ignore = true)
     @Mapping(target = "medico", ignore = true)
+    @Mapping(target = "especialidade", ignore = true)
     @Mapping(target = "dataCriacao", ignore = true)
     @Mapping(target = "dataModificacao", ignore = true)
     @Mapping(target = "status", ignore = true)
@@ -58,7 +69,6 @@ public interface ConsultaMedicaMapper {
     @Mapping(target = "dataCriacao", ignore = true)
     @Mapping(target = "dataModificacao", ignore = true)
     @Mapping(target = "status", ignore = true)
-    @Mapping(target= "diagnostico", ignore = true)
     @Mapping(target = "especialidade", ignore = true)
     @Mapping(target = "dataHora", ignore = true)
 

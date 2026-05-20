@@ -5,7 +5,7 @@ import br.com.agendeme.gestao.dto.paciente.PacienteResponse;
 import br.com.agendeme.gestao.dto.paciente.PacienteUpdate;
 import br.com.agendeme.gestao.mapper.PacienteMapper;
 import br.com.agendeme.gestao.model.domain.Paciente;
-import br.com.agendeme.gestao.model.domain.Role;
+import br.com.agendeme.gestao.model.enums.Role;
 import br.com.agendeme.gestao.repository.PacienteRepository;
 import br.com.agendeme.gestao.repository.UsuarioRepository;
 import br.com.agendeme.gestao.excecoes.BusinessException;
@@ -72,13 +72,13 @@ public class PacienteService {
     }
 
     @Transactional
-    public void inativar(Long id) {
-        Paciente paciente = pacienteRepository.findById(id)
+    public void inativar(String cpf) {
+        Paciente paciente = pacienteRepository.findByCpf(cpf)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PACIENTE_NAO_ENCONTRADO, HttpStatus.NOT_FOUND));
         if (!paciente.getAtivo()) {
             throw new BusinessException(ErrorCode.PACIENTE_JA_INATIVO, HttpStatus.UNPROCESSABLE_ENTITY);
         }
-        pacienteRepository.deactivate(id);
+        pacienteRepository.deactivate(paciente.getId());
     }
 
     @Transactional

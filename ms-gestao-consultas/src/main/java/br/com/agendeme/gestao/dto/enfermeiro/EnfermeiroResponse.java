@@ -1,8 +1,8 @@
 package br.com.agendeme.gestao.dto.enfermeiro;
 
 import br.com.agendeme.gestao.dto.endereco.EnderecoResponse;
-import br.com.agendeme.gestao.model.domain.Role;
-import br.com.agendeme.gestao.model.domain.Sexo;
+import br.com.agendeme.gestao.model.enums.Role;
+import br.com.agendeme.gestao.model.enums.Sexo;
 
 import java.time.LocalDate;
 

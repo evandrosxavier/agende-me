@@ -20,6 +20,8 @@ public interface PacienteRepository extends JpaRepository<Paciente, Long> {
 
     Page<Paciente> findAllByAtivoTrue(Pageable pageable);
 
+    Optional<Paciente> findByLogin(String login);
+
     @Modifying
     @Transactional
     @Query("UPDATE Paciente p SET p.ativo = false WHERE p.id = :id")

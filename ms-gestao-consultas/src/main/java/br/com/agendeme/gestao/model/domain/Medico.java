@@ -1,5 +1,6 @@
 package br.com.agendeme.gestao.model.domain;
 
+import br.com.agendeme.gestao.model.enums.Especialidade;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

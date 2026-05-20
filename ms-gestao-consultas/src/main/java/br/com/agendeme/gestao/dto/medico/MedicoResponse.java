@@ -1,9 +1,9 @@
 package br.com.agendeme.gestao.dto.medico;
 
 import br.com.agendeme.gestao.dto.endereco.EnderecoResponse;
-import br.com.agendeme.gestao.model.domain.Especialidade;
-import br.com.agendeme.gestao.model.domain.Role;
-import br.com.agendeme.gestao.model.domain.Sexo;
+import br.com.agendeme.gestao.model.enums.Especialidade;
+import br.com.agendeme.gestao.model.enums.Role;
+import br.com.agendeme.gestao.model.enums.Sexo;
 import java.time.LocalDate;
 
 public record MedicoResponse(

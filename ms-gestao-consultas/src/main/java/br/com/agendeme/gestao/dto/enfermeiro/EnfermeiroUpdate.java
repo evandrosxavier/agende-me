@@ -1,7 +1,7 @@
 package br.com.agendeme.gestao.dto.enfermeiro;
 
-import br.com.agendeme.gestao.dto.endereco.EnderecoRequest;
-import br.com.agendeme.gestao.model.domain.Sexo;
+import br.com.agendeme.gestao.dto.endereco.EnderecoUpdate;
+import br.com.agendeme.gestao.model.enums.Sexo;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -22,7 +22,7 @@ public record EnfermeiroUpdate(
         Sexo sexo,
 
         @Valid
-        EnderecoRequest endereco,
+        EnderecoUpdate endereco,
 
         @Pattern(regexp = "\\d{4,10}", message = "CRE deve ter entre 4 e 10 dígitos")
         String cre,

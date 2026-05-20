@@ -1,7 +1,7 @@
 package br.com.agendeme.gestao.dto.consulta;
 
-import br.com.agendeme.gestao.model.domain.Especialidade;
-import br.com.agendeme.gestao.model.domain.StatusConsulta;
+import br.com.agendeme.gestao.model.enums.Especialidade;
+import br.com.agendeme.gestao.model.enums.StatusConsulta;
 
 import java.time.LocalDateTime;
 

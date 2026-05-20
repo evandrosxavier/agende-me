@@ -4,9 +4,9 @@ import br.com.agendeme.gestao.dto.medico.MedicoRequest;
 import br.com.agendeme.gestao.dto.medico.MedicoResponse;
 import br.com.agendeme.gestao.dto.medico.MedicoUpdate;
 import br.com.agendeme.gestao.mapper.MedicoMapper;
-import br.com.agendeme.gestao.model.domain.Especialidade;
+import br.com.agendeme.gestao.model.enums.Especialidade;
 import br.com.agendeme.gestao.model.domain.Medico;
-import br.com.agendeme.gestao.model.domain.Role;
+import br.com.agendeme.gestao.model.enums.Role;
 import br.com.agendeme.gestao.repository.MedicoRepository;
 import br.com.agendeme.gestao.repository.UsuarioRepository;
 import br.com.agendeme.gestao.excecoes.BusinessException;
@@ -80,13 +80,13 @@ public class MedicoService {
     }
 
     @Transactional
-    public void inativar(Long id) {
-        Medico medico = medicoRepository.findById(id)
+    public void inativar(String crm) {
+        Medico medico = medicoRepository.findByCrm(crm)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEDICO_NAO_ENCONTRADO, HttpStatus.NOT_FOUND));
         if (!medico.getAtivo()) {
             throw new BusinessException(ErrorCode.MEDICO_JA_INATIVO, HttpStatus.UNPROCESSABLE_ENTITY);
         }
-        medicoRepository.deactivate(id);
+        medicoRepository.deactivate(medico.getId());
     }
 
     @Transactional

@@ -1,7 +1,7 @@
 package br.com.agendeme.gestao.dto.enfermeiro;
 
 import br.com.agendeme.gestao.dto.endereco.EnderecoRequest;
-import br.com.agendeme.gestao.model.domain.Sexo;
+import br.com.agendeme.gestao.model.enums.Sexo;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 

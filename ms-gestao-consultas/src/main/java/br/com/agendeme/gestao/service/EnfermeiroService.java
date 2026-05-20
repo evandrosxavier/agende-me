@@ -7,7 +7,7 @@ import br.com.agendeme.gestao.excecoes.BusinessException;
 import br.com.agendeme.gestao.excecoes.ErrorCode;
 import br.com.agendeme.gestao.mapper.EnfermeiroMapper;
 import br.com.agendeme.gestao.model.domain.Enfermeiro;
-import br.com.agendeme.gestao.model.domain.Role;
+import br.com.agendeme.gestao.model.enums.Role;
 import br.com.agendeme.gestao.repository.EnfermeiroRepository;
 import br.com.agendeme.gestao.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
@@ -73,13 +73,13 @@ public class EnfermeiroService {
     }
 
     @Transactional
-    public void inativar(Long id) {
-        Enfermeiro enfermeiro = enfermeiroRepository.findById(id)
+    public void inativar(String cre) {
+        Enfermeiro enfermeiro = enfermeiroRepository.findByCre(cre)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENFERMEIRO_NAO_ENCONTRADO, HttpStatus.NOT_FOUND));
         if (!enfermeiro.getAtivo()) {
             throw new BusinessException(ErrorCode.ENFERMEIRO_JA_INATIVO, HttpStatus.UNPROCESSABLE_ENTITY);
         }
-        enfermeiroRepository.deactivate(id);
+        enfermeiroRepository.deactivate(enfermeiro.getId());
     }
 
     @Transactional

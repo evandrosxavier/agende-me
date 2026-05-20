@@ -1,6 +1,6 @@
 package br.com.agendeme.gestao.dto.consulta;
 
-import br.com.agendeme.gestao.model.domain.Especialidade;
+import br.com.agendeme.gestao.model.enums.Especialidade;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 

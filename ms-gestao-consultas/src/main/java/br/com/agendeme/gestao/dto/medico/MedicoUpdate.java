@@ -1,8 +1,8 @@
 package br.com.agendeme.gestao.dto.medico;
 
-import br.com.agendeme.gestao.dto.endereco.EnderecoRequest;
-import br.com.agendeme.gestao.model.domain.Especialidade;
-import br.com.agendeme.gestao.model.domain.Sexo;
+import br.com.agendeme.gestao.dto.endereco.EnderecoUpdate;
+import br.com.agendeme.gestao.model.enums.Especialidade;
+import br.com.agendeme.gestao.model.enums.Sexo;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -23,7 +23,7 @@ public record MedicoUpdate(
         Sexo sexo,
 
         @Valid
-        EnderecoRequest endereco,
+        EnderecoUpdate endereco,
 
         @Pattern(regexp = "\\d{4,10}", message = "CRM deve ter no máximo 10 caracteres")
         String crm,

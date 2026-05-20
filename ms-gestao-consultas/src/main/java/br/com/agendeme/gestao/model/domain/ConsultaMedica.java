@@ -1,5 +1,7 @@
 package br.com.agendeme.gestao.model.domain;
 
+import br.com.agendeme.gestao.model.enums.Especialidade;
+import br.com.agendeme.gestao.model.enums.StatusConsulta;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

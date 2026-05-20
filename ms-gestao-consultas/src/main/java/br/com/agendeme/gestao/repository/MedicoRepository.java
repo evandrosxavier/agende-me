@@ -1,6 +1,6 @@
 package br.com.agendeme.gestao.repository;
 
-import br.com.agendeme.gestao.model.domain.Especialidade;
+import br.com.agendeme.gestao.model.enums.Especialidade;
 import br.com.agendeme.gestao.model.domain.Medico;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
