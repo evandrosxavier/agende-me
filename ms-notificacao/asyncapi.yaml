@@ -1,0 +1,174 @@
+asyncapi: '2.6.0'
+
+info:
+  title: ms-notificacao
+  version: '1.0.0'
+  description: |
+    Worker responsável por consumir eventos de consultas médicas publicados via Apache Kafka
+    e enviar notificações por e-mail aos pacientes cadastrados no sistema Agende-me.
+  contact:
+    name: Equipe Agende-me
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  local:
+    url: localhost:9092
+    protocol: kafka
+    description: Broker Kafka local (desenvolvimento)
+
+defaultContentType: application/json
+
+channels:
+
+  consulta-agendada:
+    description: |
+      Tópico publicado pelo ms-gestao-consultas quando uma nova consulta é agendada.
+      O ms-notificacao consome este evento e envia um e-mail de confirmação ao paciente.
+    subscribe:
+      operationId: consumirConsultaAgendada
+      summary: Consome evento de consulta agendada
+      tags:
+        - name: consulta
+        - name: agendamento
+      message:
+        $ref: '#/components/messages/ConsultaNotificacaoMessage'
+
+  consulta-agendamento-atualizado:
+    description: |
+      Tópico publicado pelo ms-gestao-consultas quando os dados de agendamento de uma consulta
+      são alterados (data, hora ou médico). O ms-notificacao envia um e-mail informando a atualização.
+    subscribe:
+      operationId: consumirConsultaAtualizada
+      summary: Consome evento de atualização de consulta agendada
+      tags:
+        - name: consulta
+        - name: agendamento
+      message:
+        $ref: '#/components/messages/ConsultaNotificacaoMessage'
+
+  consulta-atendimento-registrado:
+    description: |
+      Tópico publicado pelo ms-gestao-consultas quando uma consulta é marcada como realizada.
+      O ms-notificacao envia um e-mail de confirmação do atendimento ao paciente.
+    subscribe:
+      operationId: consumirConsultaRealizada
+      summary: Consome evento de consulta realizada
+      tags:
+        - name: consulta
+        - name: atendimento
+      message:
+        $ref: '#/components/messages/ConsultaNotificacaoMessage'
+
+  consulta-cancelada:
+    description: |
+      Tópico publicado pelo ms-gestao-consultas quando uma consulta é cancelada.
+      O ms-notificacao envia um e-mail de cancelamento ao paciente.
+    subscribe:
+      operationId: consumirConsultaCancelada
+      summary: Consome evento de consulta cancelada
+      tags:
+        - name: consulta
+        - name: cancelamento
+      message:
+        $ref: '#/components/messages/ConsultaNotificacaoMessage'
+
+components:
+
+  messages:
+    ConsultaNotificacaoMessage:
+      name: ConsultaNotificacaoDTO
+      title: Evento de Consulta Médica
+      summary: Mensagem contendo os dados da consulta para envio de notificação por e-mail
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/ConsultaNotificacaoDTO'
+      examples:
+        - name: consultaAgendada
+          summary: Exemplo de evento de consulta agendada
+          payload:
+            consultaId: 10
+            pacienteNome: Maria Clara Santos
+            pacienteCpf: "12345678901"
+            pacienteEmail: maria.santos@email.com
+            medicoNome: Dr. Carlos Eduardo Ferreira
+            medicoCrm: "123456"
+            especialidade: CARDIOLOGIA
+            dataHora: "2026-06-15T14:30:00"
+            status: AGENDADA
+            dataEvento: "2026-05-20T10:00:00"
+
+  schemas:
+    ConsultaNotificacaoDTO:
+      type: object
+      description: Payload de notificação enviado pelo ms-gestao-consultas via Kafka
+      required:
+        - consultaId
+        - pacienteNome
+        - pacienteCpf
+        - pacienteEmail
+        - medicoNome
+        - medicoCrm
+        - especialidade
+        - dataHora
+        - status
+        - dataEvento
+      properties:
+        consultaId:
+          type: integer
+          format: int64
+          description: Identificador único da consulta
+          example: 10
+        pacienteNome:
+          type: string
+          description: Nome completo do paciente
+          example: Maria Clara Santos
+        pacienteCpf:
+          type: string
+          description: CPF do paciente (11 dígitos sem formatação)
+          example: "12345678901"
+        pacienteEmail:
+          type: string
+          format: email
+          description: E-mail do paciente para envio da notificação
+          example: maria.santos@email.com
+        medicoNome:
+          type: string
+          description: Nome completo do médico responsável
+          example: Dr. Carlos Eduardo Ferreira
+        medicoCrm:
+          type: string
+          description: Número do CRM do médico
+          example: "123456"
+        especialidade:
+          type: string
+          description: Especialidade médica da consulta
+          enum:
+            - CARDIOLOGIA
+            - DERMATOLOGIA
+            - ORTOPEDIA
+            - PEDIATRIA
+            - GINECOLOGIA
+            - NEUROLOGIA
+            - OFTALMOLOGIA
+            - PSIQUIATRIA
+            - CLINICO_GERAL
+          example: CARDIOLOGIA
+        dataHora:
+          type: string
+          description: Data e hora da consulta no formato ISO 8601
+          example: "2026-06-15T14:30:00"
+        status:
+          type: string
+          description: Status atual da consulta
+          enum:
+            - AGENDADA
+            - REALIZADA
+            - CANCELADA
+          example: AGENDADA
+        dataEvento:
+          type: string
+          description: Data e hora em que o evento foi gerado (ISO 8601)
+          example: "2026-05-20T10:00:00"
+
