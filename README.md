@@ -1,51 +1,266 @@
 # Agende-me
 
-Sistema backend para agendamento e gerenciamento de consultas médicas em ambiente hospitalar, composto por múltiplos serviços independentes com comunicação assíncrona.
+Sistema backend para agendamento e gerenciamento de consultas médicas em ambiente hospitalar, composto por três microserviços independentes com comunicação assíncrona via Apache Kafka.
+
+---
 
 ## Arquitetura
 
-O sistema é dividido em três microserviços independentes, cada um com seu próprio banco de dados e responsabilidades bem definidas.
+```
+┌─────────────────────────┐        Kafka Topics         ┌──────────────────────┐
+│   ms-gestao-consultas   │ ──────────────────────────► │    ms-notificacao    │
+│      (porta 8081)       │                             │      (porta 8082)    │
+│  REST API + Swagger UI  │                             │  E-mail ao paciente  │
+└─────────────────────────┘                             └──────────────────────┘
+           │
+           │ Kafka Topics
+           ▼
+┌─────────────────────────┐
+│   ms-hist-consultas     │
+│      (porta 8083)       │
+│    GraphQL + GraphiQL   │
+└─────────────────────────┘
+```
 
-### Serviços
+Cada microserviço possui seu **próprio banco de dados PostgreSQL**, garantindo isolamento e disponibilidade independente.
 
-**ms-gestao-consultas** — responsável pelo cadastro, atualização, cancelamento e consulta de agendamentos médicos. É o serviço central do sistema e publica eventos no Kafka sempre que uma consulta é criada ou alterada.
+---
 
-**ms-notificacao** — consome os eventos publicados pelo ms-gestao-consultas e envia lembretes automáticos aos pacientes sobre suas consultas.
+## Microserviços
 
-**ms-hist-consultas** — consome os mesmos eventos do Kafka e mantém seu próprio banco de dados com o histórico de consultas, expondo-o via GraphQL para consultas flexíveis por diferentes clientes.
+### ms-gestao-consultas — porta 8081
+Serviço central do sistema. Responsável pelo cadastro e gerenciamento de pacientes, médicos, enfermeiros e consultas médicas. Publica eventos no Kafka sempre que uma consulta é criada ou alterada.
+
+### ms-notificacao — porta 8082
+Consome os eventos do Kafka publicados pelo `ms-gestao-consultas` e envia lembretes automáticos por e-mail aos pacientes sobre suas consultas.
+
+### ms-hist-consultas — porta 8083
+Consome os mesmos eventos do Kafka e mantém um banco de dados próprio com o histórico completo de eventos de cada consulta. Expõe os dados via GraphQL para consultas flexíveis.
+
+---
+
+## Tecnologias
+
+| Tecnologia | Versão |
+|---|---|
+| Java | 21 |
+| Spring Boot | 3.5.x |
+| Spring Security | JWT stateless |
+| Spring Data JPA | Hibernate |
+| Spring for Apache Kafka | Consumer / Producer |
+| Spring GraphQL | GraphiQL habilitado |
+| PostgreSQL | 16 |
+| Docker / Docker Compose | — |
+| Lombok | — |
+| SpringDoc OpenAPI (Swagger) | ms-gestao-consultas |
+
+---
 
 ## Decisões Técnicas
 
 | Tecnologia | Decisão | Justificativa |
 |---|---|---|
-| Banco de dados | PostgreSQL por serviço | Dados estruturados com relacionamentos claros. Isolamento garante disponibilidade independente entre serviços |
-| Mensageria | Kafka | Permite múltiplos consumidores independentes no mesmo evento. Escalável para novos serviços no futuro |
+| Banco de dados | PostgreSQL por serviço | Isolamento garante disponibilidade independente entre serviços |
+| Mensageria | Kafka | Permite múltiplos consumidores independentes no mesmo evento. Escalável para novos serviços |
 | API de histórico | GraphQL | Flexibilidade para diferentes clientes consumirem exatamente os campos que precisam |
-| Segurança | Spring Security | Autenticação e autorização por perfil de acesso em cada serviço |
+| Segurança | Spring Security + JWT | Autenticação stateless com autorização por perfil de acesso |
 
-## Níveis de Acesso
+---
+
+## Níveis de Acesso (ms-gestao-consultas)
 
 | Perfil | Permissões |
 |---|---|
-| Médico | Visualizar e editar histórico de consultas |
-| Enfermeiro | Registrar novas consultas e acessar histórico |
-| Paciente | Visualizar apenas as próprias consultas |
+| **ADMIN** | Acesso total: cadastrar/inativar médicos, enfermeiros e pacientes; gerenciar consultas |
+| **MEDICO** | Registrar e atualizar atendimentos; visualizar consultas; visualizar médicos e pacientes |
+| **ENFERMEIRO** | Agendar e cancelar consultas; cadastrar e atualizar pacientes; visualizar médicos |
+| **PACIENTE** | Visualizar apenas as próprias consultas (`/consultas/minhas-consultas`) |
 
-## Tecnologias
+> O usuário **admin** padrão é criado automaticamente na primeira execução:
+> - Login: `admin`
+> - Senha: `Admin@123`
 
+---
+
+## Tópicos Kafka
+
+| Tópico | Publicado quando |
+|---|---|
+| `consulta-agendada` | Nova consulta é criada |
+| `consulta-agendamento-atualizado` | Dados de agendamento são alterados (data, médico) |
+| `consulta-atendimento-registrado` | Atendimento da consulta é registrado |
+| `consulta-atendimento-atualizado` | Dados do atendimento são corrigidos |
+| `consulta-cancelada` | Consulta é cancelada |
+
+---
+
+## Endpoints — ms-gestao-consultas (porta 8081)
+
+> Documentação interativa disponível em: `http://localhost:8081/swagger-ui/index.html`
+
+### Autenticação
+| Método | Endpoint | Acesso | Descrição |
+|---|---|---|---|
+| POST | `/login` | Público | Autenticação. Retorna token JWT |
+
+### Pacientes
+| Método | Endpoint | Roles | Descrição |
+|---|---|---|---|
+| POST | `/pacientes` | ENFERMEIRO, ADMIN | Cadastrar paciente |
+| GET | `/pacientes` | ENFERMEIRO, ADMIN | Listar todos os pacientes (paginado) |
+| GET | `/pacientes/ativos` | ENFERMEIRO, ADMIN | Listar pacientes ativos |
+| GET | `/pacientes/cpf/{cpf}` | ENFERMEIRO, ADMIN | Buscar por CPF |
+| GET | `/pacientes/nome?nome=` | ENFERMEIRO, ADMIN | Buscar por nome (parcial) |
+| PATCH | `/pacientes/{id}` | ENFERMEIRO, ADMIN | Atualizar dados |
+| DELETE | `/pacientes/{cpf}` | ENFERMEIRO, ADMIN | Inativar paciente |
+
+### Médicos
+| Método | Endpoint | Roles | Descrição |
+|---|---|---|---|
+| POST | `/medicos` | ADMIN | Cadastrar médico |
+| GET | `/medicos` | ENFERMEIRO, ADMIN | Listar todos os médicos |
+| GET | `/medicos/ativos` | ENFERMEIRO, ADMIN | Listar médicos ativos |
+| GET | `/medicos/crm/{crm}` | MEDICO, ENFERMEIRO, ADMIN | Buscar por CRM |
+| GET | `/medicos/nome?nome=` | MEDICO, ENFERMEIRO, ADMIN | Buscar por nome (parcial) |
+| GET | `/medicos/especialidade?especialidade=` | ENFERMEIRO, ADMIN | Buscar por especialidade |
+| PATCH | `/medicos/{id}` | ADMIN | Atualizar dados |
+| DELETE | `/medicos/{crm}` | ADMIN | Inativar médico |
+
+### Enfermeiros
+| Método | Endpoint | Roles | Descrição |
+|---|---|---|---|
+| POST | `/enfermeiros` | ADMIN | Cadastrar enfermeiro |
+| GET | `/enfermeiros` | ENFERMEIRO, ADMIN | Listar todos |
+| GET | `/enfermeiros/ativos` | ENFERMEIRO, ADMIN | Listar ativos |
+| GET | `/enfermeiros/cre/{cre}` | ENFERMEIRO, ADMIN | Buscar por CRE |
+| GET | `/enfermeiros/nome?nome=` | ENFERMEIRO, ADMIN | Buscar por nome (parcial) |
+| PATCH | `/enfermeiros/{id}` | ADMIN | Atualizar dados |
+| DELETE | `/enfermeiros/{cre}` | ADMIN | Inativar enfermeiro |
+
+### Consultas Médicas
+| Método | Endpoint | Roles | Descrição |
+|---|---|---|---|
+| POST | `/consultas` | MEDICO, ENFERMEIRO, ADMIN | Agendar consulta |
+| PATCH | `/consultas/{id}/agendamento` | MEDICO, ENFERMEIRO, ADMIN | Atualizar dados de agendamento |
+| PATCH | `/consultas/{id}/atendimento` | MEDICO, ADMIN | Registrar atendimento realizado |
+| PATCH | `/consultas/{id}/atendimento/atualizacao` | MEDICO, ADMIN | Corrigir dados do atendimento |
+| PATCH | `/consultas/{id}/cancelar` | MEDICO, ENFERMEIRO, ADMIN | Cancelar consulta |
+| GET | `/consultas/minhas-consultas` | PACIENTE | Ver consultas do paciente autenticado |
+| GET | `/consultas/paciente/{cpf}` | MEDICO, ENFERMEIRO, ADMIN | Buscar por CPF do paciente |
+| GET | `/consultas/medico/{crm}` | MEDICO, ENFERMEIRO, ADMIN | Buscar por CRM do médico |
+| GET | `/consultas/periodo?inicio=&fim=` | MEDICO, ENFERMEIRO, ADMIN | Buscar por intervalo de datas |
+| GET | `/consultas/status?status=` | MEDICO, ENFERMEIRO, ADMIN | Buscar por status |
+| GET | `/consultas/especialidade?especialidade=` | MEDICO, ENFERMEIRO, ADMIN | Buscar por especialidade |
+
+---
+
+## Queries GraphQL — ms-hist-consultas (porta 8083)
+
+> Interface interativa disponível em: `http://localhost:8083/graphiql`
+
+Requer token JWT no header: `Authorization: Bearer <token>`
+
+| Query | Parâmetros | Descrição |
+|---|---|---|
+| `buscarPorPacienteCpf` | `cpf!`, `page`, `size` | Histórico completo de um paciente pelo CPF |
+| `buscarPorPacienteCpfAposData` | `cpf!`, `dataHora!`, `page`, `size` | Consultas futuras ou após uma data |
+| `buscarPorPacienteNome` | `nome!`, `page`, `size` | Busca por nome parcial do paciente |
+| `buscarPorMedicoCrm` | `crm!`, `page`, `size` | Histórico por CRM do médico |
+| `buscarPorMedicoNome` | `nome!`, `page`, `size` | Busca por nome parcial do médico |
+| `buscarPorStatus` | `status!`, `page`, `size` | Filtro por status: AGENDADA, REALIZADA, CANCELADA |
+
+**Exemplo de query:**
+```graphql
+query {
+  buscarPorPacienteCpf(cpf: "12345678900", page: 0, size: 10) {
+    consultaId
+    pacienteNome
+    medicoNome
+    especialidade
+    dataHora
+    status
+    dataEvento
+  }
+}
+```
+
+---
+
+## Configuração e Execução
+
+### Pré-requisitos
+- Docker e Docker Compose instalados
 - Java 21
-- Spring Boot 3.5.x
-- Spring Security
-- Spring Data JPA
-- Spring for Apache Kafka
-- PostgreSQL
-- GraphQL
-- Docker Compose
+- Maven 3.9+
+
+### 1. Subir a infraestrutura (banco + Kafka)
+
+**Obrigatório: iniciar primeiro o ms-gestao-consultas** (contém Zookeeper, Kafka e seu banco):
+```bash
+cd ms-gestao-consultas
+docker compose up -d
+```
+
+Em seguida, subir os bancos dos demais serviços:
+```bash
+cd ../ms-notificacao
+docker compose up -d
+
+cd ../ms-hist-consultas
+docker compose up -d
+```
+
+### 2. Executar os microserviços
+
+Em terminais separados, na raiz de cada microserviço:
+
+```bash
+# Terminal 1
+cd ms-gestao-consultas
+./mvnw spring-boot:run
+
+# Terminal 2
+cd ms-notificacao
+./mvnw spring-boot:run
+
+# Terminal 3
+cd ms-hist-consultas
+./mvnw spring-boot:run
+```
+
+### 3. Verificar os serviços
+
+| Serviço | URL |
+|---|---|
+| ms-gestao-consultas (Swagger) | http://localhost:8081/swagger-ui/index.html |
+| ms-hist-consultas (GraphiQL) | http://localhost:8083/graphiql |
+
+---
+
+## Bancos de Dados
+
+| Serviço | Container | Porta | Banco |
+|---|---|---|---|
+| ms-gestao-consultas | agende-me-db | 5432 | agendeme_db |
+| ms-notificacao | agende-me-notificacoes-db | 5433 | agendeme_notificacoes_db |
+| ms-hist-consultas | agende-me-historico-db | 5434 | agendeme_historico_db |
+
+Credenciais padrão: `admin` / `admin`
+
+---
 
 ## Estrutura do Repositório
+
+```
 agende-me/
 ├── README.md
-├── docker-compose.yml
-├── ms-gestao-consultas/
-├── ms-notificacao/
-└── ms-hist-consultas/
+├── ms-gestao-consultas/       # Serviço central (REST API + Kafka Producer)
+│   ├── docker-compose.yml     # PostgreSQL + Zookeeper + Kafka
+│   └── src/
+├── ms-notificacao/            # Serviço de notificações por e-mail
+│   ├── docker-compose.yaml    # Apenas PostgreSQL (Kafka compartilhado)
+│   └── src/
+└── ms-hist-consultas/         # Serviço de histórico (GraphQL)
+    ├── docker-compose.yml     # Apenas PostgreSQL (Kafka compartilhado)
+    └── src/
+```

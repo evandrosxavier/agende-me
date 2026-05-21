@@ -12,10 +12,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
@@ -25,7 +25,7 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.use.type.headers: false
-        spring.json.value.default.type: br.com.agendeme.historico.dto.HistoricoConsultaDTO
+        spring.json.value.default.type: br.com.agendeme.historico.dto.ConsultaEventDTO
   graphql:
     graphiql:
       enabled: true
@@ -36,4 +36,3 @@ api:
   security:
     token:
       secret: agende-me-secret-key-2026
-

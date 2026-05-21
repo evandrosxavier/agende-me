@@ -1,0 +1,128 @@
+"""
+Registro histórico de uma consulta médica armazenado pelo serviço de histórico.
+Cada evento de ciclo de vida de uma consulta (agendamento, atualização, realização, cancelamento)
+gera um novo registro independente nesta coleção.
+"""
+type HistoricoConsulta {
+    "Identificador único do registro no banco de dados."
+    id: ID
+
+    "Identificador da consulta no serviço ms-gestao-consultas."
+    consultaId: ID
+
+    "Nome completo do paciente no momento do evento."
+    pacienteNome: String
+
+    "CPF do paciente (somente dígitos, sem máscara)."
+    pacienteCpf: String
+
+    "E-mail do paciente para contato."
+    pacienteEmail: String
+
+    "Nome completo do médico responsável pela consulta."
+    medicoNome: String
+
+    "CRM do médico responsável pela consulta."
+    medicoCrm: String
+
+    "Especialidade médica associada à consulta."
+    especialidade: String
+
+    "Data e hora agendada para a consulta (formato: yyyy-MM-dd'T'HH:mm:ss)."
+    dataHora: String
+
+    "Status da consulta no momento do evento: AGENDADA | REALIZADA | CANCELADA."
+    status: String
+
+    "Data e hora em que o evento foi gerado pelo ms-gestao-consultas (formato: yyyy-MM-dd'T'HH:mm:ss)."
+    dataEvento: String
+
+    "Data e hora em que o registro foi persistido neste serviço (formato: yyyy-MM-dd'T'HH:mm:ss)."
+    dataDoRegistro: String
+}
+
+type Query {
+
+    """
+    Busca o histórico de consultas pelo CPF exato do paciente.
+    Retorna lista vazia quando não há registros para o CPF informado.
+    O CPF pode ser enviado com ou sem máscara (ex: 123.456.789-00 ou 12345678900).
+    """
+    buscarPorPacienteCpf(
+        "CPF do paciente, com ou sem máscara. Obrigatório."
+        cpf: String!
+        "Número da página (base 0). Padrão: 0."
+        page: Int
+        "Quantidade de registros por página. Padrão: 10."
+        size: Int
+    ): [HistoricoConsulta]
+
+    """
+    Busca o histórico de consultas pelo CPF do paciente,
+    retornando apenas os registros com dataHora posterior à data informada.
+    Útil para filtrar consultas recentes de um paciente.
+    """
+    buscarPorPacienteCpfAposData(
+        "CPF do paciente, com ou sem máscara. Obrigatório."
+        cpf: String!
+        "Data/hora de corte no formato yyyy-MM-dd'T'HH:mm:ss (ex: 2025-01-01T00:00:00). Obrigatório."
+        dataHora: String!
+        "Número da página (base 0). Padrão: 0."
+        page: Int
+        "Quantidade de registros por página. Padrão: 10."
+        size: Int
+    ): [HistoricoConsulta]
+
+    """
+    Busca o histórico de consultas por nome parcial do paciente (case-insensitive).
+    Retorna todos os registros cujo nome do paciente contenha o trecho informado.
+    """
+    buscarPorPacienteNome(
+        "Trecho do nome do paciente (mínimo recomendado: 3 caracteres). Obrigatório."
+        nome: String!
+        "Número da página (base 0). Padrão: 0."
+        page: Int
+        "Quantidade de registros por página. Padrão: 10."
+        size: Int
+    ): [HistoricoConsulta]
+
+    """
+    Busca o histórico de consultas pelo CRM exato do médico.
+    Retorna lista vazia quando não há registros para o CRM informado.
+    """
+    buscarPorMedicoCrm(
+        "CRM do médico. Obrigatório."
+        crm: String!
+        "Número da página (base 0). Padrão: 0."
+        page: Int
+        "Quantidade de registros por página. Padrão: 10."
+        size: Int
+    ): [HistoricoConsulta]
+
+    """
+    Busca o histórico de consultas por nome parcial do médico (case-insensitive).
+    Retorna todos os registros cujo nome do médico contenha o trecho informado.
+    """
+    buscarPorMedicoNome(
+        "Trecho do nome do médico (mínimo recomendado: 3 caracteres). Obrigatório."
+        nome: String!
+        "Número da página (base 0). Padrão: 0."
+        page: Int
+        "Quantidade de registros por página. Padrão: 10."
+        size: Int
+    ): [HistoricoConsulta]
+
+    """
+    Busca o histórico de consultas por status.
+    Valores aceitos: AGENDADA, REALIZADA, CANCELADA.
+    Retorna erro BAD_REQUEST para status inválido.
+    """
+    buscarPorStatus(
+        "Status da consulta. Valores aceitos: AGENDADA | REALIZADA | CANCELADA. Obrigatório."
+        status: String!
+        "Número da página (base 0). Padrão: 0."
+        page: Int
+        "Quantidade de registros por página. Padrão: 10."
+        size: Int
+    ): [HistoricoConsulta]
+}

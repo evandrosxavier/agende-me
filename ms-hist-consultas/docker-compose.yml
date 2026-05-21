@@ -1,0 +1,41 @@
+version: '3.8'
+services:
+
+  db-historico:
+    image: postgres:16
+    container_name: agende-me-historico-db
+    ports:
+      - "5434:5432"
+    environment:
+      - POSTGRES_DB=agendeme_historico_db
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+    volumes:
+      - pgdata_historico:/var/lib/postgresql/data
+
+  # O Kafka e o Zookeeper são compartilhados com o ms-gestao-consultas.
+  # Certifique-se de que o docker-compose do ms-gestao-consultas esteja rodando antes de subir este serviço.
+  # Para subir o Kafka isoladamente, descomente o bloco abaixo:
+
+  # zookeeper:
+  #   image: confluentinc/cp-zookeeper:7.5.0
+  #   container_name: agende-me-historico-zookeeper
+  #   environment:
+  #     ZOOKEEPER_CLIENT_PORT: 2181
+
+  # kafka:
+  #   image: confluentinc/cp-kafka:7.5.0
+  #   container_name: agende-me-historico-kafka
+  #   ports:
+  #     - "9092:9092"
+  #   environment:
+  #     KAFKA_BROKER_ID: 1
+  #     KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+  #     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+  #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  #   depends_on:
+  #     - zookeeper
+
+volumes:
+  pgdata_historico:
+

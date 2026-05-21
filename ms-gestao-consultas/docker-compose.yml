@@ -17,7 +17,14 @@ services:
     container_name: agende-me-zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
-
+    volumes:
+      - zookeeper_data:/var/lib/zookeeper/data
+      - zookeeper_log:/var/lib/zookeeper/log
+    healthcheck:
+      test: echo ruok | nc localhost 2181 || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
   kafka:
     image: confluentinc/cp-kafka:7.5.0
     container_name: agende-me-kafka
@@ -29,7 +36,13 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     depends_on:
-      - zookeeper
+      zookeeper:
+        condition: service_healthy
+    volumes:
+      - kafka_data:/var/lib/kafka/data
 
 volumes:
   pgdata:
+  zookeeper_data:
+  zookeeper_log:
+  kafka_data:
