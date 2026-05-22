@@ -15,6 +15,7 @@ public interface ConsultaMedicaMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "paciente", ignore = true)
     @Mapping(target = "medico", ignore = true)
+    @Mapping(target = "especialidade", ignore = true)
     @Mapping(target = "dataCriacao", ignore = true)
     @Mapping(target = "dataModificacao", ignore = true)
     @Mapping(target = "status", ignore = true)

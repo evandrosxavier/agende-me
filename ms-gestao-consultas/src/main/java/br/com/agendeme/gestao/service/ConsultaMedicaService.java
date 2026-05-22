@@ -57,6 +57,7 @@ public class ConsultaMedicaService {
         ConsultaMedica consulta = consultaMedicaMapper.toEntity(dto);
         consulta.setMedico(medico);
         consulta.setPaciente(paciente);
+        consulta.setEspecialidade(medico.getEspecialidade());
         consulta.setStatus(StatusConsulta.AGENDADA);
         ConsultaMedica consultaSalva = consultaRepository.save(consulta);
 
