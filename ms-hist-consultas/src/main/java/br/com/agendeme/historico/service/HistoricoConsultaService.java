@@ -62,7 +62,7 @@ public class HistoricoConsultaService {
     }
 
     @Transactional
-    public void salvarHistorico(ConsultaEventDTO dto) {
+    public void salvarHistorico(ConsultaEventDTO dto, String tipoEvento) {
         LocalDateTime dataEvento = LocalDateTime.parse(dto.dataEvento());
 
         if (historicoRepository.findByConsultaIdAndDataEvento(dto.consultaId(), dataEvento).isPresent()) {
@@ -80,11 +80,15 @@ public class HistoricoConsultaService {
                     .medicoCrm(dto.medicoCrm())
                     .especialidade(dto.especialidade())
                     .dataHora(parseDataHora(dto.dataHora()))
+                    .diagnostico(dto.diagnostico())
+                    .tratamentoProposto(dto.tratamentoProposto())
+                    .demaisObservacoes(dto.demaisObservacoes())
                     .status(dto.status())
+                    .tipoEvento(tipoEvento)
                     .dataEvento(dataEvento)
                     .build();
             historicoRepository.save(historico);
-            log.info("Histórico salvo | consultaId={} | status={}", dto.consultaId(), dto.status());
+            log.info("Histórico salvo | consultaId={} | tipoEvento {} | status={}", dto.consultaId(), tipoEvento, dto.status());
         } catch (Exception e) {
             log.error("Erro ao salvar histórico | consultaId={} | erro={}", dto.consultaId(), e.getMessage());
             throw e;
@@ -116,6 +120,9 @@ public class HistoricoConsultaService {
                 entity.getMedicoCrm(),
                 entity.getEspecialidade(),
                 entity.getDataHora() != null ? entity.getDataHora().format(FORMATTER) : null,
+                entity.getDiagnostico(),
+                entity.getTratamentoProposto(),
+                entity.getDemaisObservacoes(),
                 entity.getStatus(),
                 entity.getDataEvento() != null ? entity.getDataEvento().format(FORMATTER) : null,
                 entity.getDataDoRegistro() != null ? entity.getDataDoRegistro().format(FORMATTER) : null

@@ -17,30 +17,30 @@ public class HistoricoConsultaListener {
     @KafkaListener(topics = "consulta-agendada", groupId = "${spring.kafka.consumer.group-id}")
     public void onConsultaAgendada(ConsultaEventDTO dto) {
         log.info("Evento recebido [consulta-agendada] | consultaId={}", dto.consultaId());
-        historicoConsultaService.salvarHistorico(dto);
+        historicoConsultaService.salvarHistorico(dto, "CRIACAO");
     }
 
     @KafkaListener(topics = "consulta-agendamento-atualizado", groupId = "${spring.kafka.consumer.group-id}")
     public void onConsultaAgendadaAtualizada(ConsultaEventDTO dto) {
         log.info("Evento recebido [consulta-atualizada] | consultaId={}", dto.consultaId());
-        historicoConsultaService.salvarHistorico(dto);
+        historicoConsultaService.salvarHistorico(dto, "ALTERACAO_AGENDAMENTO");
     }
 
     @KafkaListener(topics = "consulta-atendimento-registrado", groupId = "${spring.kafka.consumer.group-id}")
     public void onConsultaRealizada(ConsultaEventDTO dto) {
         log.info("Evento recebido [consulta-realizada] | consultaId={}", dto.consultaId());
-        historicoConsultaService.salvarHistorico(dto);
+        historicoConsultaService.salvarHistorico(dto, "ATENDIMENTO_REALIZADO");
     }
 
     @KafkaListener(topics = "consulta-atendimento-atualizado", groupId = "${spring.kafka.consumer.group-id}")
     public void onConsultaMedicaAtualizada(ConsultaEventDTO dto) {
         log.info("Evento recebido [consulta-medica-atualizada] | consultaId={}", dto.consultaId());
-        historicoConsultaService.salvarHistorico(dto);
+        historicoConsultaService.salvarHistorico(dto, "ALTERACAO_ATENDIMENTO");
     }
 
     @KafkaListener(topics = "consulta-cancelada", groupId = "${spring.kafka.consumer.group-id}")
     public void onConsultaCancelada(ConsultaEventDTO dto) {
         log.info("Evento recebido [consulta-cancelada] | consultaId={}", dto.consultaId());
-        historicoConsultaService.salvarHistorico(dto);
+        historicoConsultaService.salvarHistorico(dto, "CANCELAMENTO");
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class HistoricoConsultaController {
 
     private final HistoricoConsultaService historicoService;
 
+    @PreAuthorize("hasAnyRole('MEDICO', 'ENFERMEIRO', 'ADMIN')")
     @QueryMapping
     public List<HistoricoConsultaDTO> buscarPorPacienteCpf(
             @Argument String cpf,
@@ -27,7 +29,7 @@ public class HistoricoConsultaController {
             @Argument Integer size) {
         return historicoService.buscarPorPacienteCpf(cpf, pageable(page, size)).getContent();
     }
-
+    @PreAuthorize("hasAnyRole('MEDICO', 'ENFERMEIRO', 'ADMIN')")
     @QueryMapping
     public List<HistoricoConsultaDTO> buscarPorPacienteCpfAposData(
             @Argument String cpf,
@@ -36,7 +38,7 @@ public class HistoricoConsultaController {
             @Argument Integer size) {
         return historicoService.buscarPorPacienteCpfAposData(cpf, dataHora, pageable(page, size)).getContent();
     }
-
+    @PreAuthorize("hasAnyRole('MEDICO', 'ENFERMEIRO', 'ADMIN')")
     @QueryMapping
     public List<HistoricoConsultaDTO> buscarPorPacienteNome(
             @Argument String nome,
@@ -45,6 +47,7 @@ public class HistoricoConsultaController {
         return historicoService.buscarPorPacienteNome(nome, pageable(page, size)).getContent();
     }
 
+    @PreAuthorize("hasAnyRole('MEDICO', 'ENFERMEIRO', 'ADMIN')")
     @QueryMapping
     public List<HistoricoConsultaDTO> buscarPorMedicoCrm(
             @Argument String crm,
@@ -52,7 +55,7 @@ public class HistoricoConsultaController {
             @Argument Integer size) {
         return historicoService.buscarPorMedicoCrm(crm, pageable(page, size)).getContent();
     }
-
+    @PreAuthorize("hasAnyRole('MEDICO', 'ENFERMEIRO', 'ADMIN')")
     @QueryMapping
     public List<HistoricoConsultaDTO> buscarPorMedicoNome(
             @Argument String nome,
@@ -60,7 +63,7 @@ public class HistoricoConsultaController {
             @Argument Integer size) {
         return historicoService.buscarPorMedicoNome(nome, pageable(page, size)).getContent();
     }
-
+    @PreAuthorize("hasAnyRole('MEDICO', 'ENFERMEIRO', 'ADMIN')")
     @QueryMapping
     public List<HistoricoConsultaDTO> buscarPorStatus(
             @Argument String status,

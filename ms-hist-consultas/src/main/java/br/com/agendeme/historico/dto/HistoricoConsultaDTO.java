@@ -13,6 +13,9 @@ public record HistoricoConsultaDTO(
         String dataHora,
         String status,
         String dataEvento,
-        String dataDoRegistro
+        String dataDoRegistro,
+        String diagnostico,
+        String tratamentoProposto,
+        String demaisObservacoes
 
 ) { }
