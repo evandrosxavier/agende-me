@@ -10,6 +10,10 @@ public record ConsultaNotificacaoDTO(
         String especialidade,
         String dataHora,
         String status,
-        String dataEvento
+        String dataEvento,
+        String diagnostico,
+        String tratamentoProposto,
+        String demaisObservacoes
+
 
 ) {}
