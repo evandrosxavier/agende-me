@@ -17,15 +17,15 @@ public class NotificacaoLogService {
 
     private final NotificacaoLogRepository repository;
 
-    public void registrarSucesso(Long consultaId, String tipoEvento,
+    public void registrarSucesso(Long consultaId, String tipoEvento, String statusConsulta,
                                   String destinatario, String pacienteNome, String assunto) {
-        salvar(consultaId, tipoEvento, destinatario, pacienteNome, assunto, StatusEnvio.ENVIADO, null);
+        salvar(consultaId, tipoEvento, statusConsulta, destinatario, pacienteNome, assunto, StatusEnvio.ENVIADO, null);
     }
 
-    public void registrarFalha(Long consultaId, String tipoEvento,
+    public void registrarFalha(Long consultaId, String tipoEvento, String statusConsulta,
                                 String destinatario, String pacienteNome, String assunto,
                                 String mensagemErro) {
-        salvar(consultaId, tipoEvento, destinatario, pacienteNome, assunto, StatusEnvio.FALHA, mensagemErro);
+        salvar(consultaId, tipoEvento, statusConsulta, destinatario, pacienteNome, assunto, StatusEnvio.FALHA, mensagemErro);
     }
 
     public List<NotificacaoLogResponseDTO> listarTodos() {
@@ -52,12 +52,13 @@ public class NotificacaoLogService {
                 .toList();
     }
 
-    private void salvar(Long consultaId, String tipoEvento, String destinatario,
+    private void salvar(Long consultaId, String tipoEvento, String statusConsulta, String destinatario,
                         String pacienteNome, String assunto, StatusEnvio status, String mensagemErro) {
         try {
             NotificacaoLog notificacaoLog = NotificacaoLog.builder()
                     .consultaId(consultaId)
                     .tipoEvento(tipoEvento)
+                    .statusConsulta(statusConsulta)
                     .destinatario(destinatario)
                     .pacienteNome(pacienteNome)
                     .assunto(assunto)

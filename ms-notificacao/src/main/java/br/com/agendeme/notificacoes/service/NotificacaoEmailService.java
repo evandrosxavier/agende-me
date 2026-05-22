@@ -30,22 +30,22 @@ public class NotificacaoEmailService {
 
     public void enviarConsultaAgendada(ConsultaNotificacaoDTO dto) {
         String assunto = "Consulta Agendada - Agende-me";
-        enviar(dto, "AGENDADA", assunto, montarCorpoAgendada(dto));
+        enviar(dto, "CRIACAO", assunto, montarCorpoAgendada(dto));
     }
 
     public void enviarConsultaAgendadaAtualizada(ConsultaNotificacaoDTO dto) {
         String assunto = "Consulta Atualizada - Agende-me";
-        enviar(dto, "ATUALIZADA", assunto, montarCorpoAtualizada(dto));
+        enviar(dto, "ALTERACAO_AGENDAMENTO", assunto, montarCorpoAtualizada(dto));
     }
 
     public void enviarConsultaRealizada(ConsultaNotificacaoDTO dto) {
         String assunto = "Consulta Realizada - Agende-me";
-        enviar(dto, "REALIZADA", assunto, montarCorpoRealizada(dto));
+        enviar(dto, "ATENDIMENTO_REALIZADO", assunto, montarCorpoRealizada(dto));
     }
 
     public void enviarConsultaCancelada(ConsultaNotificacaoDTO dto) {
         String assunto = "Consulta Cancelada - Agende-me";
-        enviar(dto, "CANCELADA", assunto, montarCorpoCancelada(dto));
+        enviar(dto, "CANCELAMENTO", assunto, montarCorpoCancelada(dto));
     }
 
 
@@ -148,7 +148,7 @@ public class NotificacaoEmailService {
             log.info("E-mail enviado | Tipo: {} | Para: {} | Consulta ID: {}",
                     tipoEvento, dto.pacienteEmail(), dto.consultaId());
 
-            logService.registrarSucesso(dto.consultaId(), tipoEvento,
+            logService.registrarSucesso(dto.consultaId(), tipoEvento, dto.status(),
                     dto.pacienteEmail(), dto.pacienteNome(), assunto);
 
         } catch (Exception e) {
@@ -159,7 +159,7 @@ public class NotificacaoEmailService {
                     tipoEvento, dto.pacienteEmail(), dto.consultaId(), mensagemErro);
             log.debug("Stack trace completo:", e);
 
-            logService.registrarFalha(dto.consultaId(), tipoEvento,
+            logService.registrarFalha(dto.consultaId(), tipoEvento, dto.status(),
                     dto.pacienteEmail(), dto.pacienteNome(), assunto, mensagemErro);
         }
     }

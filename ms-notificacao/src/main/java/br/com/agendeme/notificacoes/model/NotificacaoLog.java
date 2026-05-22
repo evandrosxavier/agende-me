@@ -33,6 +33,9 @@ public class NotificacaoLog {
     @Column(nullable = false)
     private String assunto;
 
+    @Column(length = 30)
+    private String statusConsulta;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
     private StatusEnvio status;
