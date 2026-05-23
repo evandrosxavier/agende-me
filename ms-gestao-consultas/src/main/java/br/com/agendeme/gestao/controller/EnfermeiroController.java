@@ -1,5 +1,6 @@
 package br.com.agendeme.gestao.controller;
 
+import br.com.agendeme.gestao.dto.enfermeiro.EnfermeiroReativacaoRequest;
 import br.com.agendeme.gestao.dto.enfermeiro.EnfermeiroRequest;
 import br.com.agendeme.gestao.dto.enfermeiro.EnfermeiroResponse;
 import br.com.agendeme.gestao.dto.enfermeiro.EnfermeiroUpdate;
@@ -140,5 +141,25 @@ public class EnfermeiroController {
     public ResponseEntity<Void> inativar(@PathVariable String cre) {
         enfermeiroService.inativar(cre);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Reativar enfermeiro", description = "Reativa um enfermeiro inativo pelo CRE, atualizando opcionalmente seus dados. Login e CRE não podem ser alterados.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Enfermeiro reativado com sucesso",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = EnfermeiroResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Enfermeiro não encontrado",
+                    content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "409", description = "E-mail já está em uso por outro usuário",
+                    content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "422", description = "Enfermeiro já está ativo",
+                    content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                    content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class)))
+    })
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/{cre}/reativar")
+    public ResponseEntity<EnfermeiroResponse> reativar(@PathVariable String cre,
+                                                       @RequestBody @Valid EnfermeiroReativacaoRequest dto) {
+        return ResponseEntity.ok(enfermeiroService.reativar(cre, dto));
     }
 }

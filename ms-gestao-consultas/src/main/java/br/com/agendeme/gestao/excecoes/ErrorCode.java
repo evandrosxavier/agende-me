@@ -15,6 +15,7 @@ public enum ErrorCode {
     LOGIN_NOT_FOUND("O login informado não foi encontrado na base de dados."),
     INVALID_PASSWORD("A senha atual informada está incorreta."),
     INVALID_LOGIN_PASSWORD("Login ou senha inválidos. Tente novamente!"),
+    USUARIO_INATIVO("Usuário inativo. Entre em contato com o administrador."),
 
     // CPF
     CPF_JA_CADASTRADO("Já existe um paciente cadastrado com o CPF informado."),
@@ -23,18 +24,24 @@ public enum ErrorCode {
     CRM_JA_CADASTRADO("Já existe um médico cadastrado com o CRM informado."),
     MEDICO_NAO_ENCONTRADO("Médico não encontrado com o identificador informado."),
     MEDICO_JA_INATIVO("O médico informado já está inativo."),
+    MEDICO_JA_ATIVO("O médico informado já está ativo."),
     MEDICO_INATIVO("O médico informado está inativo e não pode ser alterado."),
+    MEDICO_CADASTRO_INATIVO("Já existe um cadastro inativo com este CRM. Utilize o endpoint de reativação."),
 
     // Paciente
     PACIENTE_NAO_ENCONTRADO("Paciente não encontrado com o identificador informado."),
     PACIENTE_JA_INATIVO("O paciente informado já está inativo."),
+    PACIENTE_JA_ATIVO("O paciente informado já está ativo."),
     PACIENTE_INATIVO("O paciente informado está inativo e não pode ser alterado."),
+    PACIENTE_CADASTRO_INATIVO("Já existe um cadastro inativo com este CPF. Utilize o endpoint de reativação."),
 
     // Enfermeiro
     CRE_JA_CADASTRADO("Já existe um enfermeiro cadastrado com o CRE informado."),
     ENFERMEIRO_NAO_ENCONTRADO("Enfermeiro não encontrado com o identificador informado."),
     ENFERMEIRO_JA_INATIVO("O enfermeiro informado já está inativo."),
+    ENFERMEIRO_JA_ATIVO("O enfermeiro informado já está ativo."),
     ENFERMEIRO_INATIVO("O enfermeiro informado está inativo e não pode ser alterado."),
+    ENFERMEIRO_CADASTRO_INATIVO("Já existe um cadastro inativo com este CRE. Utilize o endpoint de reativação."),
 
     // Consulta
     PACIENTE_INATIVO_CONSULTA("O paciente informado está inativo. Não é possível seguir com o agendamento ou alteração da consulta."),

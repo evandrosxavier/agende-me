@@ -1,5 +1,6 @@
 package br.com.agendeme.gestao.controller;
 
+import br.com.agendeme.gestao.dto.paciente.PacienteReativacaoRequest;
 import br.com.agendeme.gestao.dto.paciente.PacienteRequest;
 import br.com.agendeme.gestao.dto.paciente.PacienteResponse;
 import br.com.agendeme.gestao.dto.paciente.PacienteUpdate;
@@ -139,6 +140,26 @@ public class PacienteController {
     public ResponseEntity<Void> inativar(@PathVariable String cpf) {
         pacienteService.inativar(cpf);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Reativar paciente", description = "Reativa um paciente inativo pelo CPF, atualizando opcionalmente seus dados. Login e CPF não podem ser alterados.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Paciente reativado com sucesso",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = PacienteResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Paciente não encontrado",
+                    content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "409", description = "E-mail já está em uso por outro usuário",
+                    content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "422", description = "Paciente já está ativo",
+                    content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                    content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class)))
+    })
+    @PreAuthorize("hasAnyRole('ENFERMEIRO', 'ADMIN')")
+    @PatchMapping("/{cpf}/reativar")
+    public ResponseEntity<PacienteResponse> reativar(@PathVariable String cpf,
+                                                     @RequestBody @Valid PacienteReativacaoRequest dto) {
+        return ResponseEntity.ok(pacienteService.reativar(cpf, dto));
     }
 }
 

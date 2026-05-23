@@ -1,8 +1,10 @@
 package br.com.agendeme.gestao.service;
 
+import br.com.agendeme.gestao.dto.medico.MedicoReativacaoRequest;
 import br.com.agendeme.gestao.dto.medico.MedicoRequest;
 import br.com.agendeme.gestao.dto.medico.MedicoResponse;
 import br.com.agendeme.gestao.dto.medico.MedicoUpdate;
+import br.com.agendeme.gestao.mapper.EnderecoMapper;
 import br.com.agendeme.gestao.mapper.MedicoMapper;
 import br.com.agendeme.gestao.model.enums.Especialidade;
 import br.com.agendeme.gestao.model.domain.Medico;
@@ -26,13 +28,17 @@ public class MedicoService {
     private final MedicoRepository medicoRepository;
     private final UsuarioRepository usuarioRepository;
     private final MedicoMapper medicoMapper;
+    private final EnderecoMapper enderecoMapper;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public MedicoResponse cadastrar(MedicoRequest dto) {
-        if (medicoRepository.findByCrm(dto.crm()).isPresent()) {
-            throw new BusinessException(ErrorCode.CRM_JA_CADASTRADO, HttpStatus.CONFLICT);
-        }
+        medicoRepository.findByCrm(dto.crm()).ifPresent(m -> {
+            if (m.getAtivo()) {
+                throw new BusinessException(ErrorCode.CRM_JA_CADASTRADO, HttpStatus.CONFLICT);
+            }
+            throw new BusinessException(ErrorCode.MEDICO_CADASTRO_INATIVO, HttpStatus.UNPROCESSABLE_ENTITY);
+        });
         if (usuarioRepository.findByLogin(dto.login()).isPresent()) {
             throw new BusinessException(ErrorCode.LOGIN_ALREADY_EXISTS, HttpStatus.CONFLICT);
         }
@@ -43,6 +49,30 @@ public class MedicoService {
         Medico medico = medicoMapper.toEntity(dto);
         medico.setSenha(passwordEncoder.encode(dto.senha()));
         medico.setRole(Role.MEDICO);
+        medico.setAtivo(true);
+        return medicoMapper.toResponseDTO(medicoRepository.save(medico));
+    }
+
+    @Transactional
+    public MedicoResponse reativar(String crm, MedicoReativacaoRequest dto) {
+        Medico medico = medicoRepository.findByCrm(crm)
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEDICO_NAO_ENCONTRADO, HttpStatus.NOT_FOUND));
+
+        if (medico.getAtivo()) {
+            throw new BusinessException(ErrorCode.MEDICO_JA_ATIVO, HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
+        if (dto.email() != null) {
+            usuarioRepository.findByEmail(dto.email())
+                    .filter(u -> !u.getId().equals(medico.getId()))
+                    .ifPresent(u -> { throw new BusinessException(ErrorCode.EMAIL_ALREADY_EXISTS, HttpStatus.CONFLICT); });
+            medico.setEmail(dto.email());
+        }
+        if (dto.ddd() != null) medico.setDdd(dto.ddd());
+        if (dto.telefone() != null) medico.setTelefone(dto.telefone());
+        if (dto.endereco() != null) medico.setEndereco(enderecoMapper.toEntity(dto.endereco()));
+
+        medico.setSenha(passwordEncoder.encode(dto.senha()));
         medico.setAtivo(true);
         return medicoMapper.toResponseDTO(medicoRepository.save(medico));
     }

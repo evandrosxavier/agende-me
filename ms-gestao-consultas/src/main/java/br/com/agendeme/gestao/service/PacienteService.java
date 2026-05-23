@@ -1,8 +1,10 @@
 package br.com.agendeme.gestao.service;
 
+import br.com.agendeme.gestao.dto.paciente.PacienteReativacaoRequest;
 import br.com.agendeme.gestao.dto.paciente.PacienteRequest;
 import br.com.agendeme.gestao.dto.paciente.PacienteResponse;
 import br.com.agendeme.gestao.dto.paciente.PacienteUpdate;
+import br.com.agendeme.gestao.mapper.EnderecoMapper;
 import br.com.agendeme.gestao.mapper.PacienteMapper;
 import br.com.agendeme.gestao.model.domain.Paciente;
 import br.com.agendeme.gestao.model.enums.Role;
@@ -25,13 +27,17 @@ public class PacienteService {
     private final PacienteRepository pacienteRepository;
     private final UsuarioRepository usuarioRepository;
     private final PacienteMapper pacienteMapper;
+    private final EnderecoMapper enderecoMapper;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public PacienteResponse cadastrar(PacienteRequest dto) {
-        if (pacienteRepository.findByCpf(dto.cpf()).isPresent()) {
-            throw new BusinessException(ErrorCode.CPF_JA_CADASTRADO, HttpStatus.CONFLICT);
-        }
+        pacienteRepository.findByCpf(dto.cpf()).ifPresent(p -> {
+            if (p.getAtivo()) {
+                throw new BusinessException(ErrorCode.CPF_JA_CADASTRADO, HttpStatus.CONFLICT);
+            }
+            throw new BusinessException(ErrorCode.PACIENTE_CADASTRO_INATIVO, HttpStatus.UNPROCESSABLE_ENTITY);
+        });
         if (usuarioRepository.findByLogin(dto.login()).isPresent()) {
             throw new BusinessException(ErrorCode.LOGIN_ALREADY_EXISTS, HttpStatus.CONFLICT);
         }
@@ -42,6 +48,30 @@ public class PacienteService {
         Paciente paciente = pacienteMapper.toEntity(dto);
         paciente.setSenha(passwordEncoder.encode(dto.senha()));
         paciente.setRole(Role.PACIENTE);
+        paciente.setAtivo(true);
+        return pacienteMapper.toResponseDTO(pacienteRepository.save(paciente));
+    }
+
+    @Transactional
+    public PacienteResponse reativar(String cpf, PacienteReativacaoRequest dto) {
+        Paciente paciente = pacienteRepository.findByCpf(cpf)
+                .orElseThrow(() -> new BusinessException(ErrorCode.PACIENTE_NAO_ENCONTRADO, HttpStatus.NOT_FOUND));
+
+        if (paciente.getAtivo()) {
+            throw new BusinessException(ErrorCode.PACIENTE_JA_ATIVO, HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
+        if (dto.email() != null) {
+            usuarioRepository.findByEmail(dto.email())
+                    .filter(u -> !u.getId().equals(paciente.getId()))
+                    .ifPresent(u -> { throw new BusinessException(ErrorCode.EMAIL_ALREADY_EXISTS, HttpStatus.CONFLICT); });
+            paciente.setEmail(dto.email());
+        }
+        if (dto.ddd() != null) paciente.setDdd(dto.ddd());
+        if (dto.telefone() != null) paciente.setTelefone(dto.telefone());
+        if (dto.endereco() != null) paciente.setEndereco(enderecoMapper.toEntity(dto.endereco()));
+
+        paciente.setSenha(passwordEncoder.encode(dto.senha()));
         paciente.setAtivo(true);
         return pacienteMapper.toResponseDTO(pacienteRepository.save(paciente));
     }

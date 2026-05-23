@@ -1,5 +1,6 @@
 package br.com.agendeme.gestao.controller;
 
+import br.com.agendeme.gestao.dto.medico.MedicoReativacaoRequest;
 import br.com.agendeme.gestao.dto.medico.MedicoRequest;
 import br.com.agendeme.gestao.dto.medico.MedicoResponse;
 import br.com.agendeme.gestao.dto.medico.MedicoUpdate;
@@ -155,6 +156,26 @@ public class MedicoController {
     public ResponseEntity<Void> inativar(@PathVariable String crm) {
         medicoService.inativar(crm);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Reativar médico", description = "Reativa um médico inativo pelo CRM, atualizando opcionalmente seus dados. Login e CRM não podem ser alterados.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Médico reativado com sucesso",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = MedicoResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Médico não encontrado",
+                    content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "409", description = "E-mail já está em uso por outro usuário",
+                    content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "422", description = "Médico já está ativo",
+                    content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                    content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class)))
+    })
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/{crm}/reativar")
+    public ResponseEntity<MedicoResponse> reativar(@PathVariable String crm,
+                                                   @RequestBody @Valid MedicoReativacaoRequest dto) {
+        return ResponseEntity.ok(medicoService.reativar(crm, dto));
     }
 }
 
