@@ -135,10 +135,10 @@ public class MedicoController {
                     content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class)))
     })
     @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping("/{id}")
-    public ResponseEntity<MedicoResponse> atualizar(@PathVariable Long id,
+    @PatchMapping("/{crm}")
+    public ResponseEntity<MedicoResponse> atualizar(@PathVariable String crm,
                                                     @RequestBody @Valid MedicoUpdate dto) {
-        return ResponseEntity.ok(medicoService.atualizar(id, dto));
+        return ResponseEntity.ok(medicoService.atualizar(crm, dto));
     }
 
     @Operation(summary = "Inativar médico", description = "Realiza a inativação lógica de um médico pelo ID.")

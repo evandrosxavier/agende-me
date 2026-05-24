@@ -31,6 +31,10 @@ public interface MedicoMapper extends IdadeCalculatorMapper{
     @Mapping(target = "especialidade", ignore = true)
     @Mapping(target = "dataNascimento", ignore = true)
     @Mapping(target = "senha", ignore = true)
+    @Mapping(target = "sexo", ignore = true)
+    @Mapping(target = "crm", ignore = true)
+    @Mapping(target = "crmUf", ignore = true)
+    @Mapping(target = "nome", ignore = true)
     void updateEntityFromDTO(MedicoUpdate dto, @MappingTarget Medico medico);
 }
 

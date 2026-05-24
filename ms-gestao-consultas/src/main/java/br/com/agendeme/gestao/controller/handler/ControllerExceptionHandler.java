@@ -4,6 +4,7 @@ import br.com.agendeme.gestao.excecoes.BusinessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -11,10 +12,13 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class ControllerExceptionHandler {
@@ -43,12 +47,44 @@ public class ControllerExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail);
     }
 
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ProblemDetail> handlerMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        problemDetail.setTitle("Parâmetro Inválido");
+        problemDetail.setType(URI.create(BASE_URL + "validation-error"));
+        Class<?> requiredType = e.getRequiredType();
+        if (requiredType != null && requiredType.isEnum()) {
+            String valoresValidos = Arrays.stream(requiredType.getEnumConstants())
+                    .map(Object::toString)
+                    .collect(Collectors.joining(", "));
+            problemDetail.setDetail("Valor inválido '" + e.getValue() + "' para o parâmetro '" + e.getName() +
+                    "'. Valores aceitos: " + valoresValidos);
+        } else {
+            problemDetail.setDetail("Valor inválido '" + e.getValue() + "' para o parâmetro '" + e.getName() + "'.");
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail);
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ProblemDetail> handlerHttpMessageNotReadableException(HttpMessageNotReadableException e) {
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
-        problemDetail.setTitle("Erro de Validação");
-        problemDetail.setDetail("Erro ao processar a requisição. Verifique se todos os campos obrigatórios foram preenchidos corretamente.");
         problemDetail.setType(URI.create(BASE_URL + "validation-error"));
+        problemDetail.setTitle("Erro de Validação");
+
+        Throwable cause = e.getCause();
+        if (cause instanceof InvalidFormatException invalidFormat && invalidFormat.getTargetType() != null
+                && invalidFormat.getTargetType().isEnum()) {
+            String campo = invalidFormat.getPath().isEmpty() ? "desconhecido"
+                    : invalidFormat.getPath().get(invalidFormat.getPath().size() - 1).getFieldName();
+            String valoresValidos = Arrays.stream(invalidFormat.getTargetType().getEnumConstants())
+                    .map(Object::toString)
+                    .collect(Collectors.joining(", "));
+            problemDetail.setDetail("Valor inválido '" + invalidFormat.getValue() +
+                    "' para o campo '" + campo + "'. Valores aceitos: " + valoresValidos);
+        } else {
+            problemDetail.setDetail("Erro ao processar a requisição. Verifique se todos os campos obrigatórios foram preenchidos corretamente.");
+        }
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail);
     }
 

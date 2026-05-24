@@ -1,6 +1,7 @@
 package br.com.agendeme.historico.controller;
 
 import br.com.agendeme.historico.dto.HistoricoConsultaDTO;
+import br.com.agendeme.historico.dto.HistoricoConsultaResumo;
 import br.com.agendeme.historico.service.HistoricoConsultaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -8,6 +9,8 @@ import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -70,6 +73,55 @@ public class HistoricoConsultaController {
             @Argument Integer page,
             @Argument Integer size) {
         return historicoService.buscarPorStatus(status, pageable(page, size)).getContent();
+    }
+
+    @PreAuthorize("hasAnyRole('MEDICO', 'ENFERMEIRO', 'ADMIN')")
+    @QueryMapping
+    public List<HistoricoConsultaDTO> buscarPorPeriodo(
+            @Argument String inicio,
+            @Argument String fim,
+            @Argument Integer page,
+            @Argument Integer size) {
+        return historicoService.buscarPorPeriodo(inicio, fim, pageable(page, size)).getContent();
+    }
+
+    @PreAuthorize("hasRole('PACIENTE')")
+    @QueryMapping
+    public List<HistoricoConsultaResumo> minhasConsultas(
+            @Argument Integer page,
+            @Argument Integer size) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String cpf = (String) auth.getCredentials();
+        return historicoService.buscarMinhasConsultas(cpf, pageable(page, size)).getContent();
+    }
+
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @QueryMapping
+    public List<HistoricoConsultaDTO> auditoriaBuscarPorCpf(
+            @Argument String cpf,
+            @Argument Integer page,
+            @Argument Integer size) {
+        return historicoService.auditoriaBuscarPorCpf(cpf, pageable(page, size)).getContent();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @QueryMapping
+    public List<HistoricoConsultaDTO> auditoriaBuscarPorPeriodo(
+            @Argument String inicio,
+            @Argument String fim,
+            @Argument Integer page,
+            @Argument Integer size) {
+        return historicoService.auditoriaBuscarPorPeriodo(inicio, fim, pageable(page, size)).getContent();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @QueryMapping
+    public List<HistoricoConsultaDTO> auditoriaBuscarPorConsultaId(
+            @Argument Long consultaId,
+            @Argument Integer page,
+            @Argument Integer size) {
+        return historicoService.auditoriaBuscarPorConsultaId(consultaId, pageable(page, size)).getContent();
     }
 
     private Pageable pageable(Integer page, Integer size) {

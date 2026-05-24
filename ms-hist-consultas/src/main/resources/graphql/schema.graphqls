@@ -31,21 +31,53 @@ type HistoricoConsulta {
     "Data e hora agendada para a consulta (formato: yyyy-MM-dd'T'HH:mm:ss)."
     dataHora: String
 
-    "Status da consulta no momento do evento: AGENDADA | REALIZADA | CANCELADA."
+    "Status da consulta no momento do evento: AGENDADA | ATUALIZADA | REALIZADA | CANCELADA."
     status: String
+
+    "Tipo do evento que originou o registro: AGENDAMENTO | ATUALIZACAO | REALIZACAO | CANCELAMENTO | ATUALIZACAO_ATENDIMENTO."
+    tipoEvento: String
 
     "Data e hora em que o evento foi gerado pelo ms-gestao-consultas (formato: yyyy-MM-dd'T'HH:mm:ss)."
     dataEvento: String
 
     "Data e hora em que o registro foi persistido neste serviço (formato: yyyy-MM-dd'T'HH:mm:ss)."
     dataDoRegistro: String
+
+    "Diagnóstico médico registrado no atendimento."
+    diagnostico: String
+
+    "Tratamento proposto pelo médico."
+    tratamentoProposto: String
+
+    "Demais observações clínicas."
+    demaisObservacoes: String
+}
+
+"""
+Visão resumida do histórico de consultas para o paciente autenticado.
+Não expõe dados clínicos como diagnóstico, tratamento e observações.
+"""
+type HistoricoConsultaResumo {
+    id: ID
+    consultaId: ID
+    pacienteNome: String
+    pacienteCpf: String
+    pacienteEmail: String
+    medicoNome: String
+    medicoCrm: String
+    especialidade: String
+    dataHora: String
+    status: String
+    tipoEvento: String
+    dataEvento: String
+    dataDoRegistro: String
 }
 
 type Query {
 
     """
-    Busca o histórico de consultas pelo CPF exato do paciente.
-    Retorna lista vazia quando não há registros para o CPF informado.
+    Retorna o ÚLTIMO ESTADO de cada consulta do paciente informado (um registro por consultaId).
+    Ideal para médicos e enfermeiros visualizarem a situação atual das consultas.
     O CPF pode ser enviado com ou sem máscara (ex: 123.456.789-00 ou 12345678900).
     """
     buscarPorPacienteCpf(
@@ -58,9 +90,9 @@ type Query {
     ): [HistoricoConsulta]
 
     """
-    Busca o histórico de consultas pelo CPF do paciente,
-    retornando apenas os registros com dataHora posterior à data informada.
-    Útil para filtrar consultas recentes de um paciente.
+    Retorna o ÚLTIMO ESTADO de cada consulta do paciente, filtrando apenas
+    as consultas com dataHora posterior à data informada.
+    Ideal para listar consultas futuras ou recentes de um paciente.
     """
     buscarPorPacienteCpfAposData(
         "CPF do paciente, com ou sem máscara. Obrigatório."
@@ -74,8 +106,7 @@ type Query {
     ): [HistoricoConsulta]
 
     """
-    Busca o histórico de consultas por nome parcial do paciente (case-insensitive).
-    Retorna todos os registros cujo nome do paciente contenha o trecho informado.
+    Retorna o ÚLTIMO ESTADO de cada consulta filtrando por nome parcial do paciente (case-insensitive).
     """
     buscarPorPacienteNome(
         "Trecho do nome do paciente (mínimo recomendado: 3 caracteres). Obrigatório."
@@ -87,8 +118,7 @@ type Query {
     ): [HistoricoConsulta]
 
     """
-    Busca o histórico de consultas pelo CRM exato do médico.
-    Retorna lista vazia quando não há registros para o CRM informado.
+    Retorna o ÚLTIMO ESTADO de cada consulta do médico informado pelo CRM.
     """
     buscarPorMedicoCrm(
         "CRM do médico. Obrigatório."
@@ -100,8 +130,7 @@ type Query {
     ): [HistoricoConsulta]
 
     """
-    Busca o histórico de consultas por nome parcial do médico (case-insensitive).
-    Retorna todos os registros cujo nome do médico contenha o trecho informado.
+    Retorna o ÚLTIMO ESTADO de cada consulta filtrando por nome parcial do médico (case-insensitive).
     """
     buscarPorMedicoNome(
         "Trecho do nome do médico (mínimo recomendado: 3 caracteres). Obrigatório."
@@ -113,13 +142,87 @@ type Query {
     ): [HistoricoConsulta]
 
     """
-    Busca o histórico de consultas por status.
-    Valores aceitos: AGENDADA, REALIZADA, CANCELADA.
+    Retorna o ÚLTIMO ESTADO de cada consulta filtrando pelo status atual.
+    Valores aceitos: AGENDADA, ATUALIZADA, REALIZADA, CANCELADA.
     Retorna erro BAD_REQUEST para status inválido.
     """
     buscarPorStatus(
-        "Status da consulta. Valores aceitos: AGENDADA | REALIZADA | CANCELADA. Obrigatório."
+        "Status da consulta. Valores aceitos: AGENDADA | ATUALIZADA | REALIZADA | CANCELADA. Obrigatório."
         status: String!
+        "Número da página (base 0). Padrão: 0."
+        page: Int
+        "Quantidade de registros por página. Padrão: 10."
+        size: Int
+    ): [HistoricoConsulta]
+
+    """
+    Retorna o ÚLTIMO ESTADO de cada consulta cujo dataEvento esteja dentro do período informado.
+    Útil para médicos e enfermeiros consultarem consultas recentes em um intervalo de datas.
+    Disponível para MEDICO, ENFERMEIRO e ADMIN.
+    """
+    buscarPorPeriodo(
+        "Data/hora de início no formato yyyy-MM-dd'T'HH:mm:ss. Obrigatório."
+        inicio: String!
+        "Data/hora de fim no formato yyyy-MM-dd'T'HH:mm:ss. Obrigatório."
+        fim: String!
+        "Número da página (base 0). Padrão: 0."
+        page: Int
+        "Quantidade de registros por página. Padrão: 10."
+        size: Int
+    ): [HistoricoConsulta]
+
+    """
+    Retorna o ÚLTIMO ESTADO das consultas do paciente autenticado.
+    Não requer nenhum argumento — o CPF é extraído automaticamente do token JWT.
+    Não expõe dados clínicos (diagnóstico, tratamento, observações).
+    Exclusivo para usuários com papel PACIENTE.
+    """
+    minhasConsultas(
+        "Número da página (base 0). Padrão: 0."
+        page: Int
+        "Quantidade de registros por página. Padrão: 10."
+        size: Int
+    ): [HistoricoConsultaResumo]
+
+
+    """
+    [AUDITORIA] Retorna o ciclo de vida COMPLETO de todas as consultas de um paciente,
+    incluindo todos os eventos: agendamento, atualizações, realização e cancelamento.
+    Exclusivo para ADMIN.
+    """
+    auditoriaBuscarPorCpf(
+        "CPF do paciente, com ou sem máscara. Obrigatório."
+        cpf: String!
+        "Número da página (base 0). Padrão: 0."
+        page: Int
+        "Quantidade de registros por página. Padrão: 10."
+        size: Int
+    ): [HistoricoConsulta]
+
+    """
+    [AUDITORIA] Retorna todos os eventos registrados no período informado,
+    ordenados por consultaId e dataEvento. Útil para análise temporal de atividades.
+    Exclusivo para ADMIN.
+    """
+    auditoriaBuscarPorPeriodo(
+        "Data/hora de início no formato yyyy-MM-dd'T'HH:mm:ss. Obrigatório."
+        inicio: String!
+        "Data/hora de fim no formato yyyy-MM-dd'T'HH:mm:ss. Obrigatório."
+        fim: String!
+        "Número da página (base 0). Padrão: 0."
+        page: Int
+        "Quantidade de registros por página. Padrão: 10."
+        size: Int
+    ): [HistoricoConsulta]
+
+    """
+    [AUDITORIA] Retorna o ciclo de vida COMPLETO de uma consulta específica,
+    mostrando todos os eventos em ordem cronológica.
+    Exclusivo para ADMIN.
+    """
+    auditoriaBuscarPorConsultaId(
+        "ID da consulta no ms-gestao-consultas. Obrigatório."
+        consultaId: ID!
         "Número da página (base 0). Padrão: 0."
         page: Int
         "Quantidade de registros por página. Padrão: 10."

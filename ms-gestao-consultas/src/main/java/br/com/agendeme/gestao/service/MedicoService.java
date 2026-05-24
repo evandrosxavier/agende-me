@@ -120,8 +120,8 @@ public class MedicoService {
     }
 
     @Transactional
-    public MedicoResponse atualizar(Long id, MedicoUpdate dto) {
-        Medico medico = medicoRepository.findById(id)
+    public MedicoResponse atualizar(String crm, MedicoUpdate dto) {
+        Medico medico = medicoRepository.findByCrm(crm)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEDICO_NAO_ENCONTRADO, HttpStatus.NOT_FOUND));
         if (!medico.getAtivo()) {
             throw new BusinessException(ErrorCode.MEDICO_INATIVO, HttpStatus.UNPROCESSABLE_ENTITY);

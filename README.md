@@ -1,5 +1,7 @@
 # Agende-me
 
+> 📂 Repositório: [https://github.com/evandrosxavier/agende-me](https://github.com/evandrosxavier/agende-me)
+
 Sistema backend para agendamento e gerenciamento de consultas médicas em ambiente hospitalar, composto por três microserviços independentes com comunicação assíncrona via Apache Kafka.
 
 ---
@@ -32,7 +34,16 @@ Cada microserviço possui seu **próprio banco de dados PostgreSQL**, garantindo
 Serviço central do sistema. Responsável pelo cadastro e gerenciamento de pacientes, médicos, enfermeiros e consultas médicas. Publica eventos no Kafka sempre que uma consulta é criada ou alterada.
 
 ### ms-notificacao — porta 8082
-Consome os eventos do Kafka publicados pelo `ms-gestao-consultas` e envia lembretes automáticos por e-mail aos pacientes sobre suas consultas.
+Consome os eventos do Kafka publicados pelo `ms-gestao-consultas` e envia e-mails automáticos ao paciente a cada evento do ciclo de vida de uma consulta. São quatro tipos de notificação:
+
+| Evento                     | Assunto do e-mail enviado ao paciente                     |
+|----------------------------|-----------------------------------------------------------|
+| Consulta agendada          | "Consulta Agendada - Agende-me"                           |
+| Agendamento atualizado     | "Consulta Atualizada - Agende-me"                         |
+| Atendimento realizado      | "Consulta Realizada - Agende-me"                          |
+| Consulta cancelada         | "Consulta Cancelada - Agende-me"                          |
+
+> **Dica para testar o fluxo ponta a ponta:** ao cadastrar um paciente, informe um **e-mail válido e acessível**. Dessa forma, você verá as notificações chegando na caixa de entrada a cada evento da consulta (agendamento, atualização, realização e cancelamento).
 
 ### ms-hist-consultas — porta 8083
 Consome os mesmos eventos do Kafka e mantém um banco de dados próprio com o histórico completo de eventos de cada consulta. Expõe os dados via GraphQL para consultas flexíveis.
@@ -67,6 +78,10 @@ Consome os mesmos eventos do Kafka e mantém um banco de dados próprio com o hi
 | Segurança | Spring Security + JWT | Autenticação stateless com autorização por perfil de acesso |
 | Especialidade | Herdada do médico | Evita inconsistência entre a especialidade do médico e a informada na consulta |
 | Reativação | Campos imutáveis | Nome, sexo, data de nascimento e especialidade identificam a pessoa e não podem ser alterados na reativação |
+| Atualização por identificador de negócio | CPF, CRM ou CRE no path | Consistência com os endpoints de busca e inativação; evita exposição de IDs internos |
+| Campos imutáveis na atualização | Nome não é atualizável | Preserva integridade do prontuário e auditabilidade dos registros históricos |
+| Dois tipos GraphQL no histórico | `HistoricoConsulta` e `HistoricoConsultaResumo` | Pacientes não devem ver dados clínicos (diagnóstico, tratamento, observações) |
+| Último estado vs. ciclo de vida | Queries separadas por público | Médicos/enfermeiros/pacientes veem estado atual; administrador acessa histórico completo para auditoria |
 
 ---
 
@@ -107,7 +122,7 @@ O token retornado deve ser enviado no header de todas as requisições:
 Authorization: Bearer <token>
 ```
 
-> No **Swagger** (`/swagger-ui`): clique em **Authorize** e cole o token.
+> No **Swagger** (`/swagger-ui`): clique em **Authorize** e cole `Bearer <token>`.
 > No **GraphiQL**: clique em **Headers** (painel inferior) e adicione `{ "Authorization": "Bearer <token>" }`.
 
 ### Respostas de erro de autenticação
@@ -150,9 +165,11 @@ Authorization: Bearer <token>
 | GET | `/pacientes/ativos` | ENFERMEIRO, ADMIN | Listar pacientes ativos |
 | GET | `/pacientes/cpf/{cpf}` | ENFERMEIRO, ADMIN | Buscar por CPF |
 | GET | `/pacientes/nome?nome=` | ENFERMEIRO, ADMIN | Buscar por nome (parcial) |
-| PATCH | `/pacientes/{id}` | ENFERMEIRO, ADMIN | Atualizar dados |
+| PATCH | `/pacientes/{cpf}` | ENFERMEIRO, ADMIN | Atualizar dados (ddd, telefone, endereço) |
 | DELETE | `/pacientes/{cpf}` | ENFERMEIRO, ADMIN | Inativar paciente |
 | PATCH | `/pacientes/{cpf}/reativar` | ENFERMEIRO, ADMIN | Reativar paciente inativo (senha obrigatória) |
+
+> **Campos imutáveis:** nome, CPF, sexo, data de nascimento, login.
 
 ### Médicos
 | Método | Endpoint | Roles | Descrição |
@@ -163,9 +180,11 @@ Authorization: Bearer <token>
 | GET | `/medicos/crm/{crm}` | MEDICO, ENFERMEIRO, ADMIN | Buscar por CRM |
 | GET | `/medicos/nome?nome=` | MEDICO, ENFERMEIRO, ADMIN | Buscar por nome (parcial) |
 | GET | `/medicos/especialidade?especialidade=` | ENFERMEIRO, ADMIN | Buscar por especialidade |
-| PATCH | `/medicos/{id}` | ADMIN | Atualizar dados |
+| PATCH | `/medicos/{crm}` | ADMIN | Atualizar dados (ddd, telefone, endereço) |
 | DELETE | `/medicos/{crm}` | ADMIN | Inativar médico |
 | PATCH | `/medicos/{crm}/reativar` | ADMIN | Reativar médico inativo (senha obrigatória) |
+
+> **Campos imutáveis:** nome, CRM, CRM-UF, especialidade, sexo, data de nascimento, login.
 
 ### Enfermeiros
 | Método | Endpoint | Roles | Descrição |
@@ -175,9 +194,11 @@ Authorization: Bearer <token>
 | GET | `/enfermeiros/ativos` | ENFERMEIRO, ADMIN | Listar ativos |
 | GET | `/enfermeiros/cre/{cre}` | ENFERMEIRO, ADMIN | Buscar por CRE |
 | GET | `/enfermeiros/nome?nome=` | ENFERMEIRO, ADMIN | Buscar por nome (parcial) |
-| PATCH | `/enfermeiros/{id}` | ADMIN | Atualizar dados |
+| PATCH | `/enfermeiros/{cre}` | ADMIN | Atualizar dados (ddd, telefone, endereço) |
 | DELETE | `/enfermeiros/{cre}` | ADMIN | Inativar enfermeiro |
 | PATCH | `/enfermeiros/{cre}/reativar` | ADMIN | Reativar enfermeiro inativo (senha obrigatória) |
+
+> **Campos imutáveis:** nome, CRE, CRE-UF, sexo, data de nascimento, login.
 
 ### Consultas Médicas
 | Método | Endpoint | Roles | Descrição |
@@ -202,33 +223,47 @@ Authorization: Bearer <token>
 
 ### Autenticação no GraphiQL
 
-As queries requerem um token JWT válido. Para autenticar no GraphiQL:
+O `ms-hist-consultas` **não possui endpoint de login próprio**. O token JWT deve ser gerado no `ms-gestao-consultas`:
 
-1. Gere o token via `POST /login` no ms-gestao-consultas
+1. Gere o token via `POST http://localhost:8081/login`
 2. Acesse `http://localhost:8083/graphiql`
-3. No painel inferior, clique em **Headers**
-4. Adicione o seguinte header:
+3. No painel inferior, clique em **Headers** e adicione:
 
 ```json
-{
-  "Authorization": "Bearer <seu_token_aqui>"
-}
+{ "Authorization": "Bearer <seu_token_aqui>" }
 ```
 
-> **Atenção:** a página do GraphiQL carrega normalmente (introspecção liberada), mas a execução das queries requer autenticação com role `MEDICO`, `ENFERMEIRO` ou `ADMIN`.
+### Tipos GraphQL
 
-### Queries disponíveis
+O histórico expõe dois tipos distintos conforme o perfil do usuário:
 
-| Query | Parâmetros | Descrição |
+| Tipo | Usado por | Inclui dados clínicos |
 |---|---|---|
-| `buscarPorPacienteCpf` | `cpf!`, `page`, `size` | Histórico completo de um paciente pelo CPF |
-| `buscarPorPacienteCpfAposData` | `cpf!`, `dataHora!`, `page`, `size` | Consultas a partir de uma data |
-| `buscarPorPacienteNome` | `nome!`, `page`, `size` | Busca por nome parcial do paciente |
-| `buscarPorMedicoCrm` | `crm!`, `page`, `size` | Histórico por CRM do médico |
-| `buscarPorMedicoNome` | `nome!`, `page`, `size` | Busca por nome parcial do médico |
-| `buscarPorStatus` | `status!`, `page`, `size` | Filtro por status: AGENDADA, REALIZADA, CANCELADA |
+| `HistoricoConsulta` | MEDICO, ENFERMEIRO, ADMIN | ✅ `diagnostico`, `tratamentoProposto`, `demaisObservacoes` |
+| `HistoricoConsultaResumo` | PACIENTE | ❌ Não expõe dados clínicos |
 
-**Exemplo de query:**
+### Queries — Último estado (um registro por consulta)
+
+| Query | Parâmetros | Roles | Descrição |
+|---|---|---|---|
+| `buscarPorPacienteCpf` | `cpf!`, `page`, `size` | MEDICO, ENFERMEIRO, ADMIN | Último estado das consultas de um paciente |
+| `buscarPorPacienteCpfAposData` | `cpf!`, `dataHora!`, `page`, `size` | MEDICO, ENFERMEIRO, ADMIN | Consultas após uma data |
+| `buscarPorPacienteNome` | `nome!`, `page`, `size` | MEDICO, ENFERMEIRO, ADMIN | Busca por nome parcial do paciente |
+| `buscarPorMedicoCrm` | `crm!`, `page`, `size` | MEDICO, ENFERMEIRO, ADMIN | Último estado por CRM do médico |
+| `buscarPorMedicoNome` | `nome!`, `page`, `size` | MEDICO, ENFERMEIRO, ADMIN | Busca por nome parcial do médico |
+| `buscarPorStatus` | `status!`, `page`, `size` | MEDICO, ENFERMEIRO, ADMIN | Filtro por status atual |
+| `buscarPorPeriodo` | `inicio!`, `fim!`, `page`, `size` | MEDICO, ENFERMEIRO, ADMIN | Último estado por intervalo de datas |
+| `minhasConsultas` | `page`, `size` | PACIENTE | Consultas do paciente autenticado (CPF via JWT) |
+
+### Queries — Auditoria (ciclo de vida completo)
+
+| Query | Parâmetros | Roles | Descrição |
+|---|---|---|---|
+| `auditoriaBuscarPorCpf` | `cpf!`, `page`, `size` | ADMIN | Todos os eventos de um paciente |
+| `auditoriaBuscarPorPeriodo` | `inicio!`, `fim!`, `page`, `size` | ADMIN | Todos os eventos em um período |
+| `auditoriaBuscarPorConsultaId` | `consultaId!`, `page`, `size` | ADMIN | Ciclo de vida completo de uma consulta |
+
+**Exemplo — buscar último estado com dados clínicos:**
 ```graphql
 query {
   buscarPorPacienteCpf(cpf: "12345678900", page: 0, size: 10) {
@@ -238,11 +273,28 @@ query {
     especialidade
     dataHora
     status
-    tipoEvento
+    diagnostico
+    tratamentoProposto
+    demaisObservacoes
     dataEvento
   }
 }
 ```
+
+**Exemplo — paciente consultando as próprias consultas:**
+```graphql
+query {
+  minhasConsultas(page: 0, size: 10) {
+    consultaId
+    medicoNome
+    especialidade
+    dataHora
+    status
+  }
+}
+```
+
+> ⚠️ `minhasConsultas` usa o tipo `HistoricoConsultaResumo` — campos clínicos não estão disponíveis nessa query.
 
 ---
 
@@ -252,6 +304,19 @@ query {
 - Docker e Docker Compose instalados
 - Java 21
 - Maven 3.9+
+- (Opcional) [Postman](https://www.postman.com/) para importar a collection de testes
+
+### Collection Postman
+
+A collection com todos os endpoints já configurados está disponível no repositório:
+
+📥 [agende-me_postman_collection.json](https://github.com/evandrosxavier/agende-me/blob/main/agende-me_postman_collection.json)
+
+**Como importar:**
+1. Abra o Postman
+2. Clique em **Import**
+3. Cole o link acima ou faça download do arquivo e selecione-o
+4. Gere o token via `POST /login` e configure-o como variável de ambiente ou no header `Authorization: Bearer <token>` de cada requisição
 
 ### 1. Subir a infraestrutura (banco + Kafka)
 

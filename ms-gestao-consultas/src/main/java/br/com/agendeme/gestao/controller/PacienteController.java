@@ -119,10 +119,10 @@ public class PacienteController {
                     content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class)))
     })
     @PreAuthorize("hasAnyRole('ENFERMEIRO', 'ADMIN')")
-    @PatchMapping("/{id}")
-    public ResponseEntity<PacienteResponse> atualizar(@PathVariable Long id,
+    @PatchMapping("/{cpf}")
+    public ResponseEntity<PacienteResponse> atualizar(@PathVariable String cpf,
                                                       @RequestBody @Valid PacienteUpdate dto) {
-        return ResponseEntity.ok(pacienteService.atualizar(id, dto));
+        return ResponseEntity.ok(pacienteService.atualizar(cpf, dto));
     }
 
     @Operation(summary = "Inativar paciente", description = "Realiza a inativação lógica de um paciente pelo ID.")

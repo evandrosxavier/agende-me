@@ -38,4 +38,18 @@ public class TokenService {
             throw new RuntimeException("Token JWT inválido ou expirado", e);
         }
     }
+
+    public String getOptionalClaim(String token, String claim) {
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(secret);
+            var decoded = JWT.require(algorithm)
+                    .withIssuer("agende-me")
+                    .build()
+                    .verify(token);
+            var c = decoded.getClaim(claim);
+            return (c == null || c.isNull() || c.isMissing()) ? null : c.asString();
+        } catch (JWTVerificationException e) {
+            return null;
+        }
+    }
 }

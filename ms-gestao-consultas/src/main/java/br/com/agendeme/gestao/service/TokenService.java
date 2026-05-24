@@ -1,5 +1,6 @@
 package br.com.agendeme.gestao.service;
 
+import br.com.agendeme.gestao.model.domain.Paciente;
 import br.com.agendeme.gestao.model.domain.Usuario;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -23,12 +24,17 @@ public class TokenService {
     public String gerarToken(Usuario usuario) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
-            return JWT.create()
+            var builder = JWT.create()
                     .withIssuer("agende-me")
                     .withSubject(usuario.getLogin())
                     .withClaim("role", usuario.getRole().name())
-                    .withExpiresAt(dataExpiracao())
-                    .sign(algorithm);
+                    .withExpiresAt(dataExpiracao());
+
+            if (usuario instanceof Paciente paciente) {
+                builder = builder.withClaim("cpf", paciente.getCpf());
+            }
+
+            return builder.sign(algorithm);
         } catch (JWTCreationException e) {
             throw new RuntimeException("Erro ao gerar token JWT", e);
         }

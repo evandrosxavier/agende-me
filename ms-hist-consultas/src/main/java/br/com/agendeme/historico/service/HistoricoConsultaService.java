@@ -2,6 +2,7 @@ package br.com.agendeme.historico.service;
 
 import br.com.agendeme.historico.dto.ConsultaEventDTO;
 import br.com.agendeme.historico.dto.HistoricoConsultaDTO;
+import br.com.agendeme.historico.dto.HistoricoConsultaResumo;
 import br.com.agendeme.historico.excecoes.BusinessException;
 import br.com.agendeme.historico.excecoes.ErrorCode;
 import br.com.agendeme.historico.model.HistoricoConsulta;
@@ -27,30 +28,31 @@ public class HistoricoConsultaService {
 
     private final HistoricoConsultaRepository historicoRepository;
 
+
     @Transactional(readOnly = true)
     public Page<HistoricoConsultaDTO> buscarPorPacienteCpf(String cpf, Pageable pageable) {
-        return historicoRepository.findByPacienteCpf(normalizarCpf(cpf), pageable).map(this::toDTO);
+        return historicoRepository.findUltimoEstadoPorPacienteCpf(normalizarCpf(cpf), pageable).map(this::toDTO);
     }
 
     @Transactional(readOnly = true)
     public Page<HistoricoConsultaDTO> buscarPorPacienteCpfAposData(String cpf, String dataHora, Pageable pageable) {
         LocalDateTime data = parseDataHora(dataHora);
-        return historicoRepository.findByPacienteCpfAndDataHoraAfter(normalizarCpf(cpf), data, pageable).map(this::toDTO);
+        return historicoRepository.findUltimoEstadoPorPacienteCpfAposData(normalizarCpf(cpf), data, pageable).map(this::toDTO);
     }
 
     @Transactional(readOnly = true)
     public Page<HistoricoConsultaDTO> buscarPorPacienteNome(String nome, Pageable pageable) {
-        return historicoRepository.findByPacienteNomeContainingIgnoreCase(nome, pageable).map(this::toDTO);
+        return historicoRepository.findUltimoEstadoPorPacienteNome(nome, pageable).map(this::toDTO);
     }
 
     @Transactional(readOnly = true)
     public Page<HistoricoConsultaDTO> buscarPorMedicoCrm(String crm, Pageable pageable) {
-        return historicoRepository.findByMedicoCrm(crm, pageable).map(this::toDTO);
+        return historicoRepository.findUltimoEstadoPorMedicoCrm(crm, pageable).map(this::toDTO);
     }
 
     @Transactional(readOnly = true)
     public Page<HistoricoConsultaDTO> buscarPorMedicoNome(String nome, Pageable pageable) {
-        return historicoRepository.findByMedicoNomeContainingIgnoreCase(nome, pageable).map(this::toDTO);
+        return historicoRepository.findUltimoEstadoPorMedicoNome(nome, pageable).map(this::toDTO);
     }
 
     @Transactional(readOnly = true)
@@ -58,7 +60,40 @@ public class HistoricoConsultaService {
         if (!StatusConsulta.isValid(status)) {
             throw new BusinessException(ErrorCode.STATUS_INVALIDO, HttpStatus.BAD_REQUEST);
         }
-        return historicoRepository.findByStatus(status.toUpperCase(), pageable).map(this::toDTO);
+        return historicoRepository.findUltimoEstadoPorStatus(status.toUpperCase(), pageable).map(this::toDTO);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<HistoricoConsultaDTO> buscarPorPeriodo(String inicio, String fim, Pageable pageable) {
+        LocalDateTime dtInicio = parseDataHora(inicio);
+        LocalDateTime dtFim = parseDataHora(fim);
+        return historicoRepository.findUltimoEstadoPorPeriodo(dtInicio, dtFim, pageable).map(this::toDTO);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<HistoricoConsultaResumo> buscarMinhasConsultas(String cpf, Pageable pageable) {
+        if (cpf == null || cpf.isBlank()) {
+            throw new BusinessException(ErrorCode.STATUS_INVALIDO, HttpStatus.FORBIDDEN);
+        }
+        return historicoRepository.findUltimoEstadoPorPacienteCpf(normalizarCpf(cpf), pageable).map(this::toDTOResumo);
+    }
+
+
+    @Transactional(readOnly = true)
+    public Page<HistoricoConsultaDTO> auditoriaBuscarPorCpf(String cpf, Pageable pageable) {
+        return historicoRepository.findAuditoriaPorCpf(normalizarCpf(cpf), pageable).map(this::toDTO);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<HistoricoConsultaDTO> auditoriaBuscarPorPeriodo(String inicio, String fim, Pageable pageable) {
+        LocalDateTime dtInicio = parseDataHora(inicio);
+        LocalDateTime dtFim = parseDataHora(fim);
+        return historicoRepository.findAuditoriaPorPeriodo(dtInicio, dtFim, pageable).map(this::toDTO);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<HistoricoConsultaDTO> auditoriaBuscarPorConsultaId(Long consultaId, Pageable pageable) {
+        return historicoRepository.findAuditoriaPorConsultaId(consultaId, pageable).map(this::toDTO);
     }
 
     @Transactional
@@ -120,9 +155,26 @@ public class HistoricoConsultaService {
                 entity.getMedicoCrm(),
                 entity.getEspecialidade(),
                 entity.getDataHora() != null ? entity.getDataHora().format(FORMATTER) : null,
+                entity.getStatus(),
+                entity.getDataEvento() != null ? entity.getDataEvento().format(FORMATTER) : null,
+                entity.getDataDoRegistro() != null ? entity.getDataDoRegistro().format(FORMATTER) : null,
                 entity.getDiagnostico(),
                 entity.getTratamentoProposto(),
-                entity.getDemaisObservacoes(),
+                entity.getDemaisObservacoes()
+        );
+    }
+
+    private HistoricoConsultaResumo toDTOResumo(HistoricoConsulta entity) {
+        return new HistoricoConsultaResumo(
+                entity.getId(),
+                entity.getConsultaId(),
+                entity.getPacienteNome(),
+                entity.getPacienteCpf(),
+                entity.getPacienteEmail(),
+                entity.getMedicoNome(),
+                entity.getMedicoCrm(),
+                entity.getEspecialidade(),
+                entity.getDataHora() != null ? entity.getDataHora().format(FORMATTER) : null,
                 entity.getStatus(),
                 entity.getDataEvento() != null ? entity.getDataEvento().format(FORMATTER) : null,
                 entity.getDataDoRegistro() != null ? entity.getDataDoRegistro().format(FORMATTER) : null

@@ -112,8 +112,8 @@ public class EnfermeiroService {
     }
 
     @Transactional
-    public EnfermeiroResponse atualizar(Long id, EnfermeiroUpdate dto) {
-        Enfermeiro enfermeiro = enfermeiroRepository.findById(id)
+    public EnfermeiroResponse atualizar(String cre, EnfermeiroUpdate dto) {
+        Enfermeiro enfermeiro = enfermeiroRepository.findByCre(cre)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENFERMEIRO_NAO_ENCONTRADO, HttpStatus.NOT_FOUND));
         if (!enfermeiro.getAtivo()) {
             throw new BusinessException(ErrorCode.ENFERMEIRO_INATIVO, HttpStatus.UNPROCESSABLE_ENTITY);

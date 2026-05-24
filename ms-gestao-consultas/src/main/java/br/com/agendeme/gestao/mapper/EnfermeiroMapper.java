@@ -29,6 +29,10 @@ public interface EnfermeiroMapper extends IdadeCalculatorMapper {
     @Mapping(target = "email", ignore = true)
     @Mapping(target = "senha", ignore = true)
     @Mapping(target = "dataNascimento", ignore = true)
+    @Mapping(target = "sexo", ignore = true)
+    @Mapping(target = "cre", ignore = true)
+    @Mapping(target = "creUf", ignore = true)
+    @Mapping(target = "nome", ignore = true)
     void updateEntityFromDTO(EnfermeiroUpdate dto, @MappingTarget Enfermeiro enfermeiro);
 }
 

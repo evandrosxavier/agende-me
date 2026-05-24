@@ -31,6 +31,8 @@ public interface PacienteMapper extends IdadeCalculatorMapper{
     @Mapping(target = "senha", ignore = true)
     @Mapping(target = "dataNascimento", ignore = true)
     @Mapping(target = "cpf", ignore = true)
+    @Mapping(target = "sexo", ignore = true)
+    @Mapping(target = "nome", ignore = true)
     void updateEntityFromDTO(PacienteUpdate dto, @MappingTarget Paciente paciente);
 
 }

@@ -112,8 +112,8 @@ public class PacienteService {
     }
 
     @Transactional
-    public PacienteResponse atualizar(Long id, PacienteUpdate dto) {
-        Paciente paciente = pacienteRepository.findById(id)
+    public PacienteResponse atualizar(String cpf, PacienteUpdate dto) {
+        Paciente paciente = pacienteRepository.findByCpf(cpf)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PACIENTE_NAO_ENCONTRADO, HttpStatus.NOT_FOUND));
 
         if (!paciente.getAtivo()) {
