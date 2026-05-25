@@ -754,6 +754,18 @@ Retornam **todos os eventos** de cada consulta em ordem cronológica. Disponíve
 | `auditoriaBuscarPorPeriodo`    | `inicio: String!, fim: String!`      | Todos os eventos registrados em um intervalo       |
 | `auditoriaBuscarPorConsultaId` | `consultaId: ID!`                    | Ciclo de vida completo de uma consulta específica  |
 
+> As queries de auditoria retornam o campo **`tipoEvento`**, que identifica o que originou cada registro no histórico:
+>
+> | Valor | Significado |
+> |---|---|
+> | `CRIACAO` | Consulta agendada pela primeira vez |
+> | `ALTERACAO_AGENDAMENTO` | Data, horário ou dados do agendamento foram alterados |
+> | `ATENDIMENTO_REALIZADO` | Atendimento médico registrado |
+> | `ALTERACAO_ATENDIMENTO` | Dados clínicos do atendimento foram atualizados |
+> | `CANCELAMENTO` | Consulta cancelada |
+>
+> Este campo está presente **apenas no tipo `HistoricoConsulta`** (queries normais e de auditoria), e **não** está disponível no tipo `HistoricoConsultaResumo` (usado em `minhasConsultas`).
+
 ### 7.5. Exemplos de Consultas
 
 **Último estado com dados clínicos (médico):**
@@ -810,12 +822,18 @@ query {
 query {
   auditoriaBuscarPorConsultaId(consultaId: "5", page: 0, size: 20) {
     id
+    consultaId
+    pacienteNome
+    medicoNome
+    especialidade
+    dataHora
     status
     tipoEvento
     dataEvento
     dataDoRegistro
     diagnostico
     tratamentoProposto
+    demaisObservacoes
   }
 }
 ```

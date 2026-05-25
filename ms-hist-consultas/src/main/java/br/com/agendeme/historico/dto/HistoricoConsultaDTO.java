@@ -12,6 +12,7 @@ public record HistoricoConsultaDTO(
         String especialidade,
         String dataHora,
         String status,
+        String tipoEvento,
         String dataEvento,
         String dataDoRegistro,
         String diagnostico,

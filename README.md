@@ -263,6 +263,34 @@ O histórico expõe dois tipos distintos conforme o perfil do usuário:
 | `auditoriaBuscarPorPeriodo` | `inicio!`, `fim!`, `page`, `size` | ADMIN | Todos os eventos em um período |
 | `auditoriaBuscarPorConsultaId` | `consultaId!`, `page`, `size` | ADMIN | Ciclo de vida completo de uma consulta |
 
+> As queries de auditoria retornam o tipo `HistoricoConsulta`, que inclui o campo `tipoEvento` — indicando o que originou cada registro:
+> - `CRIACAO` — consulta agendada pela primeira vez
+> - `ALTERACAO_AGENDAMENTO` — data, horário ou dados do agendamento foram alterados
+> - `ATENDIMENTO_REALIZADO` — atendimento médico registrado
+> - `ALTERACAO_ATENDIMENTO` — dados clínicos do atendimento foram atualizados
+> - `CANCELAMENTO` — consulta cancelada
+
+**Exemplo — auditoria completa de uma consulta:**
+```graphql
+query {
+  auditoriaBuscarPorConsultaId(consultaId: "5", page: 0, size: 20) {
+    id
+    consultaId
+    pacienteNome
+    medicoNome
+    especialidade
+    dataHora
+    status
+    tipoEvento
+    dataEvento
+    dataDoRegistro
+    diagnostico
+    tratamentoProposto
+    demaisObservacoes
+  }
+}
+```
+
 **Exemplo — buscar último estado com dados clínicos:**
 ```graphql
 query {

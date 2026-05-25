@@ -156,6 +156,7 @@ public class HistoricoConsultaService {
                 entity.getEspecialidade(),
                 entity.getDataHora() != null ? entity.getDataHora().format(FORMATTER) : null,
                 entity.getStatus(),
+                entity.getTipoEvento(),
                 entity.getDataEvento() != null ? entity.getDataEvento().format(FORMATTER) : null,
                 entity.getDataDoRegistro() != null ? entity.getDataDoRegistro().format(FORMATTER) : null,
                 entity.getDiagnostico(),
