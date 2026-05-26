@@ -280,13 +280,13 @@ query {
     medicoNome
     especialidade
     dataHora
+    diagnostico
+    tratamentoProposto
+    demaisObservacoes
     status
     tipoEvento
     dataEvento
     dataDoRegistro
-    diagnostico
-    tratamentoProposto
-    demaisObservacoes
   }
 }
 ```

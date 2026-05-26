@@ -155,13 +155,13 @@ public class HistoricoConsultaService {
                 entity.getMedicoCrm(),
                 entity.getEspecialidade(),
                 entity.getDataHora() != null ? entity.getDataHora().format(FORMATTER) : null,
+                entity.getDiagnostico(),
+                entity.getTratamentoProposto(),
+                entity.getDemaisObservacoes(),
                 entity.getStatus(),
                 entity.getTipoEvento(),
                 entity.getDataEvento() != null ? entity.getDataEvento().format(FORMATTER) : null,
-                entity.getDataDoRegistro() != null ? entity.getDataDoRegistro().format(FORMATTER) : null,
-                entity.getDiagnostico(),
-                entity.getTratamentoProposto(),
-                entity.getDemaisObservacoes()
+                entity.getDataDoRegistro() != null ? entity.getDataDoRegistro().format(FORMATTER) : null
         );
     }
 

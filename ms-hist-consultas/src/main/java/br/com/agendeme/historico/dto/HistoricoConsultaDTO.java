@@ -11,12 +11,12 @@ public record HistoricoConsultaDTO(
         String medicoCrm,
         String especialidade,
         String dataHora,
+        String diagnostico,
+        String tratamentoProposto,
+        String demaisObservacoes,
         String status,
         String tipoEvento,
         String dataEvento,
-        String dataDoRegistro,
-        String diagnostico,
-        String tratamentoProposto,
-        String demaisObservacoes
+        String dataDoRegistro
 
 ) { }

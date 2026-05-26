@@ -1,7 +1,7 @@
 {
   "info": {
-    "_postman_id": "agende-me-collection-v4",
-    "name": "Agende-Me API",
+    "_postman_id": "agende-me-collection-v5",
+    "name": "🏥 Agende-Me API",
     "description": "Collection completa do sistema Agende-Me. Inclui ms-gestao-consultas (REST - porta 8081) e ms-hist-consultas (GraphQL - porta 8083).\n\nVariáveis:\n- baseUrl: http://localhost:8081\n- baseUrlHistorico: http://localhost:8083\n- token: preenchido automaticamente após o login",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
@@ -24,11 +24,11 @@
   ],
   "item": [
     {
-      "name": "Auth",
+      "name": "🔐 Auth",
       "description": "Autenticação e geração de token JWT",
       "item": [
         {
-          "name": "Login",
+          "name": "🔑 Login",
           "event": [
             {
               "listen": "test",
@@ -58,17 +58,17 @@
               "host": ["{{baseUrl}}"],
               "path": ["login"]
             },
-            "description": "Autentica um usuário e retorna o token JWT. O token é salvo automaticamente na variável `token` da collection."
+            "description": "Autentica um usuário e retorna o token JWT. O token é salvo automaticamente na variável `token` da collection.\n\nRoles disponíveis: ADMIN, MEDICO, ENFERMEIRO, PACIENTE"
           }
         }
       ]
     },
     {
-      "name": "Médicos",
-      "description": "Gerenciamento de médicos (ms-gestao-consultas)",
+      "name": "👨‍⚕️ Médicos",
+      "description": "Gerenciamento de médicos (ms-gestao-consultas - porta 8081)",
       "item": [
         {
-          "name": "Cadastrar médico",
+          "name": "➕ Cadastrar médico",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "POST",
@@ -82,11 +82,11 @@
               "host": ["{{baseUrl}}"],
               "path": ["medicos"]
             },
-            "description": "Cadastra um novo médico. Requer role ADMIN.\n\nEspecialidades válidas: CARDIOLOGIA, DERMATOLOGIA, ENDOCRINOLOGIA, GASTROENTEROLOGIA, GERIATRIA, GINECOLOGIA, HEMATOLOGIA, INFECTOLOGIA, NEFROLOGIA, NEUROLOGIA, OFTALMOLOGIA, ONCOLOGIA, ORTOPEDIA, OTORRINOLARINGOLOGIA, PEDIATRIA, PNEUMOLOGIA, PSIQUIATRIA, REUMATOLOGIA, UROLOGIA, CIRURGIA_GERAL, CLINICO_GERAL\n\nSexo: MASCULINO | FEMININO | OUTRO"
+            "description": "Cadastra um novo médico. Requer role ADMIN.\n\nEspecialidades válidas: CARDIOLOGIA, CIRURGIA_GERAL, CLINICA_GERAL, DERMATOLOGIA, ENDOCRINOLOGIA, GASTROENTEROLOGIA, GERIATRIA, GINECOLOGIA, HEMATOLOGIA, INFECTOLOGIA, NEFROLOGIA, NEUROLOGIA, OFTALMOLOGIA, ONCOLOGIA, ORTOPEDIA, OTORRINOLARINGOLOGIA, PEDIATRIA, PNEUMOLOGIA, PSIQUIATRIA, REUMATOLOGIA, UROLOGIA\n\nSexo: MASCULINO | FEMININO | OUTRO"
           }
         },
         {
-          "name": "Buscar médico por CRM",
+          "name": "🔍 Buscar médico por CRM",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "GET",
@@ -99,45 +99,35 @@
           }
         },
         {
-          "name": "Buscar médicos por nome",
+          "name": "🔍 Buscar médicos por nome",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "GET",
             "url": {
-              "raw": "{{baseUrl}}/medicos/nome?nome=Carlos&page=0&size=10&sort=nome",
+              "raw": "{{baseUrl}}/medicos/nome?nome=Carlos",
               "host": ["{{baseUrl}}"],
               "path": ["medicos", "nome"],
-              "query": [
-                { "key": "nome", "value": "Carlos" },
-                { "key": "page", "value": "0" },
-                { "key": "size", "value": "10" },
-                { "key": "sort", "value": "nome" }
-              ]
+              "query": [{ "key": "nome", "value": "Carlos" }]
             },
-            "description": "Busca médicos cujo nome contenha o termo informado (paginado). Requer role MEDICO, ENFERMEIRO ou ADMIN."
+            "description": "Retorna lista paginada de médicos cujo nome contenha o termo informado. Requer role MEDICO, ENFERMEIRO ou ADMIN."
           }
         },
         {
-          "name": "Buscar médicos por especialidade",
+          "name": "🔍 Buscar médicos por especialidade",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "GET",
             "url": {
-              "raw": "{{baseUrl}}/medicos/especialidade?especialidade=CARDIOLOGIA&page=0&size=10&sort=nome",
+              "raw": "{{baseUrl}}/medicos/especialidade?especialidade=CARDIOLOGIA",
               "host": ["{{baseUrl}}"],
               "path": ["medicos", "especialidade"],
-              "query": [
-                { "key": "especialidade", "value": "CARDIOLOGIA" },
-                { "key": "page", "value": "0" },
-                { "key": "size", "value": "10" },
-                { "key": "sort", "value": "nome" }
-              ]
+              "query": [{ "key": "especialidade", "value": "CARDIOLOGIA" }]
             },
-            "description": "Busca médicos por especialidade (paginado). Requer role ENFERMEIRO ou ADMIN."
+            "description": "Retorna lista paginada de médicos por especialidade. Requer role ENFERMEIRO ou ADMIN.\n\nEspecialidades válidas: CARDIOLOGIA, CIRURGIA_GERAL, CLINICA_GERAL, DERMATOLOGIA, ENDOCRINOLOGIA, GASTROENTEROLOGIA, GERIATRIA, GINECOLOGIA, HEMATOLOGIA, INFECTOLOGIA, NEFROLOGIA, NEUROLOGIA, OFTALMOLOGIA, ONCOLOGIA, ORTOPEDIA, OTORRINOLARINGOLOGIA, PEDIATRIA, PNEUMOLOGIA, PSIQUIATRIA, REUMATOLOGIA, UROLOGIA"
           }
         },
         {
-          "name": "Listar todos os médicos",
+          "name": "📋 Listar todos os médicos",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "GET",
@@ -151,11 +141,11 @@
                 { "key": "sort", "value": "nome" }
               ]
             },
-            "description": "Lista todos os médicos cadastrados (paginado). Requer role ENFERMEIRO ou ADMIN."
+            "description": "Retorna lista paginada com todos os médicos cadastrados. Requer role ENFERMEIRO ou ADMIN."
           }
         },
         {
-          "name": "Listar médicos ativos",
+          "name": "✅ Listar médicos ativos",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "GET",
@@ -169,29 +159,29 @@
                 { "key": "sort", "value": "nome" }
               ]
             },
-            "description": "Lista apenas os médicos ativos (paginado). Requer role ENFERMEIRO ou ADMIN."
+            "description": "Retorna lista paginada com os médicos que estão ativos. Requer role ENFERMEIRO ou ADMIN."
           }
         },
         {
-          "name": "Atualizar médico",
+          "name": "✏️ Atualizar médico",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "PATCH",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ddd\": \"11\",\n  \"telefone\": \"999887766\",\n  \"endereco\": {\n    \"logradouro\": \"Av. Paulista\",\n    \"numero\": \"1000\",\n    \"complemento\": \"Cj 101\",\n    \"bairro\": \"Bela Vista\",\n    \"cidade\": \"São Paulo\",\n    \"uf\": \"SP\",\n    \"cep\": \"01310100\"\n  }\n}"
+              "raw": "{\n  \"ddd\": \"11\",\n  \"telefone\": \"999887766\",\n  \"endereco\": {\n    \"logradouro\": \"Av. Paulista\",\n    \"numero\": \"1000\",\n    \"complemento\": \"Andar 10\",\n    \"bairro\": \"Bela Vista\",\n    \"cidade\": \"São Paulo\",\n    \"uf\": \"SP\",\n    \"cep\": \"01310200\"\n  }\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/medicos/123456",
               "host": ["{{baseUrl}}"],
               "path": ["medicos", "123456"]
             },
-            "description": "Atualiza os dados de um médico ativo pelo CRM. Campos permitidos: ddd, telefone, endereco. Requer role ADMIN."
+            "description": "Atualiza os dados de um médico. Apenas os campos informados serão alterados (ddd, telefone, endereco). Requer role ADMIN."
           }
         },
         {
-          "name": "Inativar médico",
+          "name": "🚫 Inativar médico",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "DELETE",
@@ -200,42 +190,42 @@
               "host": ["{{baseUrl}}"],
               "path": ["medicos", "123456"]
             },
-            "description": "Inativação lógica de um médico pelo CRM. Requer role ADMIN."
+            "description": "Realiza a inativação lógica de um médico pelo CRM. Requer role ADMIN."
           }
         },
         {
-          "name": "Reativar médico",
+          "name": "♻️ Reativar médico",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "PATCH",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"carlos.novo@hospital.com\",\n  \"ddd\": \"11\",\n  \"telefone\": \"991234567\",\n  \"senha\": \"NovaSenha@456\",\n  \"endereco\": {\n    \"logradouro\": \"Rua das Flores\",\n    \"numero\": \"123\",\n    \"bairro\": \"Centro\",\n    \"cidade\": \"São Paulo\",\n    \"uf\": \"SP\",\n    \"cep\": \"01310100\"\n  }\n}"
+              "raw": "{\n  \"email\": \"carlos.ferreira@hospital.com\",\n  \"ddd\": \"11\",\n  \"telefone\": \"991234567\",\n  \"endereco\": {\n    \"logradouro\": \"Rua das Flores\",\n    \"numero\": \"123\",\n    \"complemento\": \"Sala 5\",\n    \"bairro\": \"Centro\",\n    \"cidade\": \"São Paulo\",\n    \"uf\": \"SP\",\n    \"cep\": \"01310100\"\n  },\n  \"senha\": \"Senha@123\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/medicos/123456/reativar",
               "host": ["{{baseUrl}}"],
               "path": ["medicos", "123456", "reativar"]
             },
-            "description": "Reativa um médico inativo pelo CRM. Nome, sexo, data de nascimento e especialidade são imutáveis. Senha é obrigatória. Requer role ADMIN."
+            "description": "Reativa um médico inativo pelo CRM. O campo `senha` é obrigatório. Os demais campos são opcionais e, se informados, atualizam os dados. Login e CRM não podem ser alterados. Requer role ADMIN."
           }
         }
       ]
     },
     {
-      "name": "Pacientes",
-      "description": "Gerenciamento de pacientes (ms-gestao-consultas)",
+      "name": "🧑‍🤝‍🧑 Pacientes",
+      "description": "Gerenciamento de pacientes (ms-gestao-consultas - porta 8081)",
       "item": [
         {
-          "name": "Cadastrar paciente",
+          "name": "➕ Cadastrar paciente",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nome\": \"Maria Clara Santos\",\n  \"email\": \"maria.santos@email.com\",\n  \"ddd\": \"11\",\n  \"telefone\": \"987654321\",\n  \"sexo\": \"FEMININO\",\n  \"dataNascimento\": \"1990-05-20\",\n  \"endereco\": {\n    \"logradouro\": \"Rua das Rosas\",\n    \"numero\": \"45\",\n    \"complemento\": \"Apto 12\",\n    \"bairro\": \"Jardins\",\n    \"cidade\": \"São Paulo\",\n    \"uf\": \"SP\",\n    \"cep\": \"01401000\"\n  },\n  \"login\": \"mariaclara\",\n  \"senha\": \"Senha@123\",\n  \"cpf\": \"12345678901\"\n}"
+              "raw": "{\n  \"nome\": \"Maria Clara Santos\",\n  \"email\": \"maria.santos@email.com\",\n  \"ddd\": \"11\",\n  \"telefone\": \"987654321\",\n  \"sexo\": \"FEMININO\",\n  \"dataNascimento\": \"1990-05-20\",\n  \"endereco\": {\n    \"logradouro\": \"Rua das Acácias\",\n    \"numero\": \"45\",\n    \"complemento\": \"Apto 12\",\n    \"bairro\": \"Jardim América\",\n    \"cidade\": \"São Paulo\",\n    \"uf\": \"SP\",\n    \"cep\": \"01234567\"\n  },\n  \"login\": \"mariaclara\",\n  \"senha\": \"Senha@123\",\n  \"cpf\": \"12345678901\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/pacientes",
@@ -246,7 +236,7 @@
           }
         },
         {
-          "name": "Buscar paciente por CPF",
+          "name": "🔍 Buscar paciente por CPF",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "GET",
@@ -255,30 +245,25 @@
               "host": ["{{baseUrl}}"],
               "path": ["pacientes", "cpf", "12345678901"]
             },
-            "description": "Busca um paciente pelo CPF (11 dígitos sem máscara). Requer role ENFERMEIRO ou ADMIN."
+            "description": "Busca um paciente pelo CPF (11 dígitos sem pontuação). Requer role ENFERMEIRO ou ADMIN."
           }
         },
         {
-          "name": "Buscar pacientes por nome",
+          "name": "🔍 Buscar pacientes por nome",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "GET",
             "url": {
-              "raw": "{{baseUrl}}/pacientes/nome?nome=Maria&page=0&size=10&sort=nome",
+              "raw": "{{baseUrl}}/pacientes/nome?nome=Maria",
               "host": ["{{baseUrl}}"],
               "path": ["pacientes", "nome"],
-              "query": [
-                { "key": "nome", "value": "Maria" },
-                { "key": "page", "value": "0" },
-                { "key": "size", "value": "10" },
-                { "key": "sort", "value": "nome" }
-              ]
+              "query": [{ "key": "nome", "value": "Maria" }]
             },
-            "description": "Busca pacientes cujo nome contenha o termo informado (paginado). Requer role ENFERMEIRO ou ADMIN."
+            "description": "Retorna lista paginada de pacientes cujo nome contenha o termo informado. Requer role ENFERMEIRO ou ADMIN."
           }
         },
         {
-          "name": "Listar todos os pacientes",
+          "name": "📋 Listar todos os pacientes",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "GET",
@@ -292,11 +277,11 @@
                 { "key": "sort", "value": "nome" }
               ]
             },
-            "description": "Lista todos os pacientes cadastrados (paginado). Requer role ENFERMEIRO ou ADMIN."
+            "description": "Retorna lista paginada com todos os pacientes cadastrados. Requer role ENFERMEIRO ou ADMIN."
           }
         },
         {
-          "name": "Listar pacientes ativos",
+          "name": "✅ Listar pacientes ativos",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "GET",
@@ -310,29 +295,29 @@
                 { "key": "sort", "value": "nome" }
               ]
             },
-            "description": "Lista apenas os pacientes ativos (paginado). Requer role ENFERMEIRO ou ADMIN."
+            "description": "Retorna lista paginada com os pacientes que estão ativos. Requer role ENFERMEIRO ou ADMIN."
           }
         },
         {
-          "name": "Atualizar paciente",
+          "name": "✏️ Atualizar paciente",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "PATCH",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ddd\": \"21\",\n  \"telefone\": \"998877665\",\n  \"endereco\": {\n    \"logradouro\": \"Rua Nova\",\n    \"numero\": \"200\",\n    \"bairro\": \"Copacabana\",\n    \"cidade\": \"Rio de Janeiro\",\n    \"uf\": \"RJ\",\n    \"cep\": \"22010000\"\n  }\n}"
+              "raw": "{\n  \"ddd\": \"21\",\n  \"telefone\": \"988776655\",\n  \"endereco\": {\n    \"logradouro\": \"Rua Nova\",\n    \"numero\": \"200\",\n    \"complemento\": \"\",\n    \"bairro\": \"Copacabana\",\n    \"cidade\": \"Rio de Janeiro\",\n    \"uf\": \"RJ\",\n    \"cep\": \"22010010\"\n  }\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/pacientes/12345678901",
               "host": ["{{baseUrl}}"],
               "path": ["pacientes", "12345678901"]
             },
-            "description": "Atualiza os dados de um paciente ativo pelo CPF. Campos permitidos: ddd, telefone, endereco. Requer role ENFERMEIRO ou ADMIN."
+            "description": "Atualiza os dados de um paciente. Apenas os campos informados serão alterados (ddd, telefone, endereco). Requer role ENFERMEIRO ou ADMIN."
           }
         },
         {
-          "name": "Inativar paciente",
+          "name": "🚫 Inativar paciente",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "DELETE",
@@ -341,42 +326,42 @@
               "host": ["{{baseUrl}}"],
               "path": ["pacientes", "12345678901"]
             },
-            "description": "Inativação lógica de um paciente pelo CPF. Requer role ENFERMEIRO ou ADMIN."
+            "description": "Realiza a inativação lógica de um paciente pelo CPF. Requer role ENFERMEIRO ou ADMIN."
           }
         },
         {
-          "name": "Reativar paciente",
+          "name": "♻️ Reativar paciente",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "PATCH",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"maria.novo@email.com\",\n  \"ddd\": \"11\",\n  \"telefone\": \"987654321\",\n  \"senha\": \"NovaSenha@456\",\n  \"endereco\": {\n    \"logradouro\": \"Rua das Rosas\",\n    \"numero\": \"45\",\n    \"bairro\": \"Jardins\",\n    \"cidade\": \"São Paulo\",\n    \"uf\": \"SP\",\n    \"cep\": \"01401000\"\n  }\n}"
+              "raw": "{\n  \"email\": \"maria.santos@email.com\",\n  \"ddd\": \"11\",\n  \"telefone\": \"987654321\",\n  \"endereco\": {\n    \"logradouro\": \"Rua das Acácias\",\n    \"numero\": \"45\",\n    \"complemento\": \"Apto 12\",\n    \"bairro\": \"Jardim América\",\n    \"cidade\": \"São Paulo\",\n    \"uf\": \"SP\",\n    \"cep\": \"01234567\"\n  },\n  \"senha\": \"Senha@123\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/pacientes/12345678901/reativar",
               "host": ["{{baseUrl}}"],
               "path": ["pacientes", "12345678901", "reativar"]
             },
-            "description": "Reativa um paciente inativo pelo CPF. Nome, sexo e data de nascimento são imutáveis. Senha é obrigatória. Requer role ENFERMEIRO ou ADMIN."
+            "description": "Reativa um paciente inativo pelo CPF. O campo `senha` é obrigatório. Os demais campos são opcionais. Login e CPF não podem ser alterados. Requer role ENFERMEIRO ou ADMIN."
           }
         }
       ]
     },
     {
-      "name": "Enfermeiros",
-      "description": "Gerenciamento de enfermeiros (ms-gestao-consultas)",
+      "name": "💉 Enfermeiros",
+      "description": "Gerenciamento de enfermeiros (ms-gestao-consultas - porta 8081)",
       "item": [
         {
-          "name": "Cadastrar enfermeiro",
+          "name": "➕ Cadastrar enfermeiro",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nome\": \"Ana Paula Oliveira\",\n  \"email\": \"ana.oliveira@hospital.com\",\n  \"ddd\": \"31\",\n  \"telefone\": \"995551234\",\n  \"sexo\": \"FEMININO\",\n  \"dataNascimento\": \"1990-03-15\",\n  \"endereco\": {\n    \"logradouro\": \"Av. do Contorno\",\n    \"numero\": \"500\",\n    \"complemento\": \"Bloco B\",\n    \"bairro\": \"Savassi\",\n    \"cidade\": \"Belo Horizonte\",\n    \"uf\": \"MG\",\n    \"cep\": \"30110010\"\n  },\n  \"login\": \"anaenf\",\n  \"senha\": \"Senha@123\",\n  \"cre\": \"502721\",\n  \"creUf\": \"MG\"\n}"
+              "raw": "{\n  \"nome\": \"Ana Paula Oliveira\",\n  \"email\": \"ana.oliveira@hospital.com\",\n  \"ddd\": \"31\",\n  \"telefone\": \"995551234\",\n  \"sexo\": \"FEMININO\",\n  \"dataNascimento\": \"1990-03-15\",\n  \"endereco\": {\n    \"logradouro\": \"Av. Afonso Pena\",\n    \"numero\": \"500\",\n    \"complemento\": \"Bloco B\",\n    \"bairro\": \"Centro\",\n    \"cidade\": \"Belo Horizonte\",\n    \"uf\": \"MG\",\n    \"cep\": \"30130001\"\n  },\n  \"login\": \"anaenf\",\n  \"senha\": \"Senha@123\",\n  \"cre\": \"502721\",\n  \"creUf\": \"MG\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/enfermeiros",
@@ -387,7 +372,7 @@
           }
         },
         {
-          "name": "Buscar enfermeiro por CRE",
+          "name": "🔍 Buscar enfermeiro por CRE",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "GET",
@@ -400,26 +385,21 @@
           }
         },
         {
-          "name": "Buscar enfermeiros por nome",
+          "name": "🔍 Buscar enfermeiros por nome",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "GET",
             "url": {
-              "raw": "{{baseUrl}}/enfermeiros/nome?nome=Ana&page=0&size=10&sort=nome",
+              "raw": "{{baseUrl}}/enfermeiros/nome?nome=Ana",
               "host": ["{{baseUrl}}"],
               "path": ["enfermeiros", "nome"],
-              "query": [
-                { "key": "nome", "value": "Ana" },
-                { "key": "page", "value": "0" },
-                { "key": "size", "value": "10" },
-                { "key": "sort", "value": "nome" }
-              ]
+              "query": [{ "key": "nome", "value": "Ana" }]
             },
-            "description": "Busca enfermeiros cujo nome contenha o termo informado (paginado). Requer role ENFERMEIRO ou ADMIN."
+            "description": "Retorna lista paginada de enfermeiros cujo nome contenha o termo informado. Requer role ENFERMEIRO ou ADMIN."
           }
         },
         {
-          "name": "Listar todos os enfermeiros",
+          "name": "📋 Listar todos os enfermeiros",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "GET",
@@ -433,11 +413,11 @@
                 { "key": "sort", "value": "nome" }
               ]
             },
-            "description": "Lista todos os enfermeiros cadastrados (paginado). Requer role ENFERMEIRO ou ADMIN."
+            "description": "Retorna lista paginada com todos os enfermeiros cadastrados. Requer role ENFERMEIRO ou ADMIN."
           }
         },
         {
-          "name": "Listar enfermeiros ativos",
+          "name": "✅ Listar enfermeiros ativos",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "GET",
@@ -451,29 +431,29 @@
                 { "key": "sort", "value": "nome" }
               ]
             },
-            "description": "Lista apenas os enfermeiros ativos (paginado). Requer role ENFERMEIRO ou ADMIN."
+            "description": "Retorna lista paginada com os enfermeiros que estão ativos. Requer role ENFERMEIRO ou ADMIN."
           }
         },
         {
-          "name": "Atualizar enfermeiro",
+          "name": "✏️ Atualizar enfermeiro",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "PATCH",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ddd\": \"31\",\n  \"telefone\": \"995559999\",\n  \"endereco\": {\n    \"logradouro\": \"Rua da Bahia\",\n    \"numero\": \"300\",\n    \"bairro\": \"Centro\",\n    \"cidade\": \"Belo Horizonte\",\n    \"uf\": \"MG\",\n    \"cep\": \"30160011\"\n  }\n}"
+              "raw": "{\n  \"ddd\": \"31\",\n  \"telefone\": \"996664455\",\n  \"endereco\": {\n    \"logradouro\": \"Rua da Bahia\",\n    \"numero\": \"777\",\n    \"complemento\": \"\",\n    \"bairro\": \"Lourdes\",\n    \"cidade\": \"Belo Horizonte\",\n    \"uf\": \"MG\",\n    \"cep\": \"30160010\"\n  }\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/enfermeiros/502721",
               "host": ["{{baseUrl}}"],
               "path": ["enfermeiros", "502721"]
             },
-            "description": "Atualiza os dados de um enfermeiro ativo pelo CRE. Campos permitidos: ddd, telefone, endereco. Requer role ADMIN."
+            "description": "Atualiza os dados de um enfermeiro. Apenas os campos informados serão alterados (ddd, telefone, endereco). Requer role ADMIN."
           }
         },
         {
-          "name": "Inativar enfermeiro",
+          "name": "🚫 Inativar enfermeiro",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "DELETE",
@@ -482,53 +462,53 @@
               "host": ["{{baseUrl}}"],
               "path": ["enfermeiros", "502721"]
             },
-            "description": "Inativação lógica de um enfermeiro pelo CRE. Requer role ADMIN."
+            "description": "Realiza a inativação lógica de um enfermeiro pelo CRE. Requer role ADMIN."
           }
         },
         {
-          "name": "Reativar enfermeiro",
+          "name": "♻️ Reativar enfermeiro",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "PATCH",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"ana.novo@hospital.com\",\n  \"ddd\": \"31\",\n  \"telefone\": \"995551234\",\n  \"senha\": \"NovaSenha@456\",\n  \"endereco\": {\n    \"logradouro\": \"Av. do Contorno\",\n    \"numero\": \"500\",\n    \"bairro\": \"Savassi\",\n    \"cidade\": \"Belo Horizonte\",\n    \"uf\": \"MG\",\n    \"cep\": \"30110010\"\n  }\n}"
+              "raw": "{\n  \"email\": \"ana.oliveira@hospital.com\",\n  \"ddd\": \"31\",\n  \"telefone\": \"995551234\",\n  \"endereco\": {\n    \"logradouro\": \"Av. Afonso Pena\",\n    \"numero\": \"500\",\n    \"complemento\": \"Bloco B\",\n    \"bairro\": \"Centro\",\n    \"cidade\": \"Belo Horizonte\",\n    \"uf\": \"MG\",\n    \"cep\": \"30130001\"\n  },\n  \"senha\": \"Senha@123\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/enfermeiros/502721/reativar",
               "host": ["{{baseUrl}}"],
               "path": ["enfermeiros", "502721", "reativar"]
             },
-            "description": "Reativa um enfermeiro inativo pelo CRE. Nome, sexo e data de nascimento são imutáveis. Senha é obrigatória. Requer role ADMIN."
+            "description": "Reativa um enfermeiro inativo pelo CRE. O campo `senha` é obrigatório. Os demais campos são opcionais. Login e CRE não podem ser alterados. Requer role ADMIN."
           }
         }
       ]
     },
     {
-      "name": "Consultas Médicas",
-      "description": "Agendamento e gerenciamento de consultas médicas (ms-gestao-consultas)",
+      "name": "📅 Consultas Médicas",
+      "description": "Agendamento e gerenciamento de consultas médicas (ms-gestao-consultas - porta 8081)",
       "item": [
         {
-          "name": "Agendar consulta",
+          "name": "➕ Agendar consulta",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"pacienteId\": 1,\n  \"medicoId\": 2,\n  \"dataHora\": \"2026-06-15T14:30:00\"\n}"
+              "raw": "{\n  \"pacienteId\": 1,\n  \"medicoId\": 2,\n  \"dataHora\": \"2026-07-15T14:30:00\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/consultas",
               "host": ["{{baseUrl}}"],
               "path": ["consultas"]
             },
-            "description": "Agenda uma nova consulta médica. Requer role MEDICO, ENFERMEIRO ou ADMIN."
+            "description": "Agenda uma nova consulta médica. Requer role MEDICO, ENFERMEIRO ou ADMIN.\n\nA data/hora deve ser hoje ou no futuro (FutureOrPresent)."
           }
         },
         {
-          "name": "Atualizar consulta agendada",
+          "name": "✏️ Atualizar consulta agendada",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "PATCH",
@@ -542,11 +522,11 @@
               "host": ["{{baseUrl}}"],
               "path": ["consultas", "1", "agendamento"]
             },
-            "description": "Atualiza data/hora ou médico de uma consulta agendada. Todos os campos são opcionais. Requer role MEDICO, ENFERMEIRO ou ADMIN."
+            "description": "Atualiza os dados de agendamento de uma consulta (data/hora e/ou médico). Todos os campos são opcionais. Requer role MEDICO, ENFERMEIRO ou ADMIN."
           }
         },
         {
-          "name": "Registrar atendimento da consulta",
+          "name": "🩺 Registrar atendimento",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "PATCH",
@@ -560,29 +540,29 @@
               "host": ["{{baseUrl}}"],
               "path": ["consultas", "1", "atendimento"]
             },
-            "description": "Registra o resultado do atendimento de uma consulta (muda status para REALIZADA). Requer role MEDICO ou ADMIN."
+            "description": "Registra o resultado do atendimento de uma consulta (marca como REALIZADA). Requer role MEDICO ou ADMIN.\n\nTodos os campos são opcionais, máximo 255 caracteres cada."
           }
         },
         {
-          "name": "Atualizar atendimento realizado",
+          "name": "✏️ Atualizar atendimento realizado",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "PATCH",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"diagnostico\": \"Hipertensão arterial moderada\",\n  \"tratamentoProposto\": \"Ajuste de medicação\",\n  \"demaisObservacoes\": \"Retorno em 15 dias\"\n}"
+              "raw": "{\n  \"diagnostico\": \"Hipertensão arterial moderada\",\n  \"tratamentoProposto\": \"Ajuste na medicação anti-hipertensiva\",\n  \"demaisObservacoes\": \"Retorno em 15 dias\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/consultas/1/atendimento/atualizacao",
               "host": ["{{baseUrl}}"],
               "path": ["consultas", "1", "atendimento", "atualizacao"]
             },
-            "description": "Atualiza os dados de uma consulta já realizada (diagnóstico, tratamento e observações). Requer role MEDICO ou ADMIN."
+            "description": "Atualiza os dados de uma consulta já realizada (diagnóstico, tratamento, observações). Requer role MEDICO ou ADMIN."
           }
         },
         {
-          "name": "Cancelar consulta",
+          "name": "❌ Cancelar consulta",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "PATCH",
@@ -591,11 +571,11 @@
               "host": ["{{baseUrl}}"],
               "path": ["consultas", "1", "cancelar"]
             },
-            "description": "Cancela uma consulta agendada. Consultas realizadas não podem ser canceladas. Requer role MEDICO, ENFERMEIRO ou ADMIN."
+            "description": "Cancela uma consulta previamente agendada. Consultas já realizadas não podem ser canceladas. Requer role MEDICO, ENFERMEIRO ou ADMIN."
           }
         },
         {
-          "name": "Buscar consultas por CPF do paciente",
+          "name": "🔍 Buscar consultas por CPF do paciente",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "GET",
@@ -609,11 +589,11 @@
                 { "key": "sort", "value": "dataHora" }
               ]
             },
-            "description": "Retorna as consultas de um paciente pelo CPF (paginado). Requer role MEDICO, ENFERMEIRO ou ADMIN."
+            "description": "Retorna lista paginada de consultas de um paciente pelo CPF. Requer role MEDICO, ENFERMEIRO ou ADMIN."
           }
         },
         {
-          "name": "Buscar consultas por CRM do médico",
+          "name": "🔍 Buscar consultas por CRM do médico",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "GET",
@@ -627,11 +607,11 @@
                 { "key": "sort", "value": "dataHora" }
               ]
             },
-            "description": "Retorna as consultas de um médico pelo CRM (paginado). Requer role MEDICO, ENFERMEIRO ou ADMIN."
+            "description": "Retorna lista paginada de consultas de um médico pelo CRM. Requer role MEDICO, ENFERMEIRO ou ADMIN."
           }
         },
         {
-          "name": "Buscar consultas por período",
+          "name": "📅 Buscar consultas por período",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "GET",
@@ -647,11 +627,11 @@
                 { "key": "sort", "value": "dataHora" }
               ]
             },
-            "description": "Retorna consultas dentro de um intervalo de datas (formato yyyy-MM-dd). Requer role MEDICO, ENFERMEIRO ou ADMIN."
+            "description": "Retorna lista paginada de consultas dentro do intervalo de datas. Formato: yyyy-MM-dd. Requer role MEDICO, ENFERMEIRO ou ADMIN."
           }
         },
         {
-          "name": "Buscar consultas por status",
+          "name": "🔍 Buscar consultas por status",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "GET",
@@ -666,11 +646,11 @@
                 { "key": "sort", "value": "dataHora" }
               ]
             },
-            "description": "Retorna consultas filtradas por status (AGENDADA, REALIZADA, CANCELADA). Requer role MEDICO, ENFERMEIRO ou ADMIN."
+            "description": "Retorna lista paginada de consultas filtradas pelo status. Requer role MEDICO, ENFERMEIRO ou ADMIN.\n\nStatus válidos: AGENDADA | CANCELADA | REALIZADA"
           }
         },
         {
-          "name": "Buscar consultas por especialidade",
+          "name": "🔍 Buscar consultas por especialidade",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "GET",
@@ -685,11 +665,11 @@
                 { "key": "sort", "value": "dataHora" }
               ]
             },
-            "description": "Retorna consultas filtradas por especialidade médica. Requer role MEDICO, ENFERMEIRO ou ADMIN."
+            "description": "Retorna lista paginada de consultas pela especialidade médica. Requer role MEDICO, ENFERMEIRO ou ADMIN.\n\nEspecialidades válidas: CARDIOLOGIA, CIRURGIA_GERAL, CLINICA_GERAL, DERMATOLOGIA, ENDOCRINOLOGIA, GASTROENTEROLOGIA, GERIATRIA, GINECOLOGIA, HEMATOLOGIA, INFECTOLOGIA, NEFROLOGIA, NEUROLOGIA, OFTALMOLOGIA, ONCOLOGIA, ORTOPEDIA, OTORRINOLARINGOLOGIA, PEDIATRIA, PNEUMOLOGIA, PSIQUIATRIA, REUMATOLOGIA, UROLOGIA"
           }
         },
         {
-          "name": "Minhas consultas (paciente autenticado)",
+          "name": "👤 Minhas consultas (paciente autenticado)",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "GET",
@@ -703,244 +683,211 @@
                 { "key": "sort", "value": "dataHora" }
               ]
             },
-            "description": "Retorna as consultas do paciente autenticado via JWT. Exclusivo para role PACIENTE."
+            "description": "Retorna lista paginada das consultas do paciente autenticado (CPF extraído do token JWT). Requer role PACIENTE."
           }
         }
       ]
     },
     {
-      "name": "Histórico de Consultas (GraphQL)",
-      "description": "Queries GraphQL do ms-hist-consultas (porta 8083). Endpoint: POST /graphql com header Authorization: Bearer {{token}}.\n\nRoles:\n- buscarPorPacienteCpf, buscarPorPacienteCpfAposData, buscarPorPacienteNome, buscarPorMedicoCrm, buscarPorMedicoNome, buscarPorStatus, buscarPorPeriodo → MEDICO, ENFERMEIRO, ADMIN\n- minhasConsultas → PACIENTE\n- auditoriaBuscarPorCpf, auditoriaBuscarPorPeriodo, auditoriaBuscarPorConsultaId → ADMIN",
+      "name": "📊 Histórico de Consultas (GraphQL)",
+      "description": "Consultas ao histórico via GraphQL (ms-hist-consultas - porta 8083)\n\nEndpoint: POST {{baseUrlHistorico}}/graphql\n\nTodos os requests usam Content-Type: application/json com o campo 'query' contendo a query GraphQL.\n\ntipoEvento possíveis: AGENDAMENTO | ATUALIZACAO | REALIZACAO | CANCELAMENTO | ATUALIZACAO_ATENDIMENTO",
       "item": [
         {
-          "name": "buscarPorPacienteCpf",
+          "name": "🔍 Buscar histórico por CPF do paciente",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
-              "mode": "graphql",
-              "graphql": {
-                "query": "query BuscarPorPacienteCpf($cpf: String!, $page: Int, $size: Int) {\n  buscarPorPacienteCpf(cpf: $cpf, page: $page, size: $size) {\n    id\n    consultaId\n    pacienteNome\n    pacienteCpf\n    pacienteEmail\n    medicoNome\n    medicoCrm\n    especialidade\n    dataHora\n    status\n    diagnostico\n    tratamentoProposto\n    demaisObservacoes\n    dataEvento\n    dataDoRegistro\n  }\n}",
-                "variables": "{\n  \"cpf\": \"12345678901\",\n  \"page\": 0,\n  \"size\": 10\n}"
-              }
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"{ buscarPorPacienteCpf(cpf: \\\"12345678901\\\", page: 0, size: 10) { id consultaId pacienteNome pacienteCpf pacienteEmail medicoNome medicoCrm especialidade dataHora diagnostico tratamentoProposto demaisObservacoes status tipoEvento dataEvento dataDoRegistro } }\"\n}"
             },
             "url": {
               "raw": "{{baseUrlHistorico}}/graphql",
               "host": ["{{baseUrlHistorico}}"],
               "path": ["graphql"]
             },
-            "description": "Retorna o último estado de cada consulta do paciente pelo CPF. Requer role MEDICO, ENFERMEIRO ou ADMIN."
+            "description": "Busca o histórico de consultas pelo CPF do paciente. Requer role MEDICO, ENFERMEIRO ou ADMIN.\n\nRetorna HistoricoConsultaDTO com todos os campos incluindo diagnóstico e tipoEvento."
           }
         },
         {
-          "name": "buscarPorPacienteCpfAposData",
+          "name": "🔍 Buscar histórico por CPF após data",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
-              "mode": "graphql",
-              "graphql": {
-                "query": "query BuscarPorPacienteCpfAposData($cpf: String!, $dataHora: String!, $page: Int, $size: Int) {\n  buscarPorPacienteCpfAposData(cpf: $cpf, dataHora: $dataHora, page: $page, size: $size) {\n    id\n    consultaId\n    pacienteNome\n    pacienteCpf\n    medicoNome\n    especialidade\n    dataHora\n    status\n    dataEvento\n    dataDoRegistro\n  }\n}",
-                "variables": "{\n  \"cpf\": \"12345678901\",\n  \"dataHora\": \"2026-01-01T00:00:00\",\n  \"page\": 0,\n  \"size\": 10\n}"
-              }
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"{ buscarPorPacienteCpfAposData(cpf: \\\"12345678901\\\", dataHora: \\\"2026-01-01T00:00:00\\\", page: 0, size: 10) { id consultaId pacienteNome pacienteCpf pacienteEmail medicoNome medicoCrm especialidade dataHora diagnostico tratamentoProposto demaisObservacoes status tipoEvento dataEvento dataDoRegistro } }\"\n}"
             },
             "url": {
               "raw": "{{baseUrlHistorico}}/graphql",
               "host": ["{{baseUrlHistorico}}"],
               "path": ["graphql"]
             },
-            "description": "Retorna consultas do paciente com dataHora posterior à data informada. Requer role MEDICO, ENFERMEIRO ou ADMIN."
+            "description": "Busca o histórico de consultas de um paciente após uma determinada data. Requer role MEDICO, ENFERMEIRO ou ADMIN."
           }
         },
         {
-          "name": "buscarPorPacienteNome",
+          "name": "🔍 Buscar histórico por nome do paciente",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
-              "mode": "graphql",
-              "graphql": {
-                "query": "query BuscarPorPacienteNome($nome: String!, $page: Int, $size: Int) {\n  buscarPorPacienteNome(nome: $nome, page: $page, size: $size) {\n    id\n    consultaId\n    pacienteNome\n    pacienteCpf\n    medicoNome\n    especialidade\n    dataHora\n    status\n    dataEvento\n    dataDoRegistro\n  }\n}",
-                "variables": "{\n  \"nome\": \"Maria\",\n  \"page\": 0,\n  \"size\": 10\n}"
-              }
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"{ buscarPorPacienteNome(nome: \\\"Maria\\\", page: 0, size: 10) { id consultaId pacienteNome pacienteCpf pacienteEmail medicoNome medicoCrm especialidade dataHora diagnostico tratamentoProposto demaisObservacoes status tipoEvento dataEvento dataDoRegistro } }\"\n}"
             },
             "url": {
               "raw": "{{baseUrlHistorico}}/graphql",
               "host": ["{{baseUrlHistorico}}"],
               "path": ["graphql"]
             },
-            "description": "Busca por nome parcial do paciente (case-insensitive). Requer role MEDICO, ENFERMEIRO ou ADMIN."
+            "description": "Busca o histórico de consultas pelo nome do paciente (busca parcial). Requer role MEDICO, ENFERMEIRO ou ADMIN."
           }
         },
         {
-          "name": "buscarPorMedicoCrm",
+          "name": "🔍 Buscar histórico por CRM do médico",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
-              "mode": "graphql",
-              "graphql": {
-                "query": "query BuscarPorMedicoCrm($crm: String!, $page: Int, $size: Int) {\n  buscarPorMedicoCrm(crm: $crm, page: $page, size: $size) {\n    id\n    consultaId\n    pacienteNome\n    pacienteCpf\n    medicoNome\n    medicoCrm\n    especialidade\n    dataHora\n    status\n    dataEvento\n    dataDoRegistro\n  }\n}",
-                "variables": "{\n  \"crm\": \"123456\",\n  \"page\": 0,\n  \"size\": 10\n}"
-              }
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"{ buscarPorMedicoCrm(crm: \\\"123456\\\", page: 0, size: 10) { id consultaId pacienteNome pacienteCpf pacienteEmail medicoNome medicoCrm especialidade dataHora diagnostico tratamentoProposto demaisObservacoes status tipoEvento dataEvento dataDoRegistro } }\"\n}"
             },
             "url": {
               "raw": "{{baseUrlHistorico}}/graphql",
               "host": ["{{baseUrlHistorico}}"],
               "path": ["graphql"]
             },
-            "description": "Retorna as consultas do médico pelo CRM. Requer role MEDICO, ENFERMEIRO ou ADMIN."
+            "description": "Busca o histórico de consultas pelo CRM do médico. Requer role MEDICO, ENFERMEIRO ou ADMIN."
           }
         },
         {
-          "name": "buscarPorMedicoNome",
+          "name": "🔍 Buscar histórico por nome do médico",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
-              "mode": "graphql",
-              "graphql": {
-                "query": "query BuscarPorMedicoNome($nome: String!, $page: Int, $size: Int) {\n  buscarPorMedicoNome(nome: $nome, page: $page, size: $size) {\n    id\n    consultaId\n    pacienteNome\n    pacienteCpf\n    medicoNome\n    medicoCrm\n    especialidade\n    dataHora\n    status\n    dataEvento\n    dataDoRegistro\n  }\n}",
-                "variables": "{\n  \"nome\": \"Carlos\",\n  \"page\": 0,\n  \"size\": 10\n}"
-              }
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"{ buscarPorMedicoNome(nome: \\\"Carlos\\\", page: 0, size: 10) { id consultaId pacienteNome pacienteCpf pacienteEmail medicoNome medicoCrm especialidade dataHora diagnostico tratamentoProposto demaisObservacoes status tipoEvento dataEvento dataDoRegistro } }\"\n}"
             },
             "url": {
               "raw": "{{baseUrlHistorico}}/graphql",
               "host": ["{{baseUrlHistorico}}"],
               "path": ["graphql"]
             },
-            "description": "Busca por nome parcial do médico (case-insensitive). Requer role MEDICO, ENFERMEIRO ou ADMIN."
+            "description": "Busca o histórico de consultas pelo nome do médico (busca parcial). Requer role MEDICO, ENFERMEIRO ou ADMIN."
           }
         },
         {
-          "name": "buscarPorStatus",
+          "name": "🔍 Buscar histórico por status",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
-              "mode": "graphql",
-              "graphql": {
-                "query": "query BuscarPorStatus($status: String!, $page: Int, $size: Int) {\n  buscarPorStatus(status: $status, page: $page, size: $size) {\n    id\n    consultaId\n    pacienteNome\n    pacienteCpf\n    medicoNome\n    especialidade\n    dataHora\n    status\n    dataEvento\n    dataDoRegistro\n  }\n}",
-                "variables": "{\n  \"status\": \"AGENDADA\",\n  \"page\": 0,\n  \"size\": 10\n}"
-              }
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"{ buscarPorStatus(status: \\\"REALIZADA\\\", page: 0, size: 10) { id consultaId pacienteNome pacienteCpf pacienteEmail medicoNome medicoCrm especialidade dataHora diagnostico tratamentoProposto demaisObservacoes status tipoEvento dataEvento dataDoRegistro } }\"\n}"
             },
             "url": {
               "raw": "{{baseUrlHistorico}}/graphql",
               "host": ["{{baseUrlHistorico}}"],
               "path": ["graphql"]
             },
-            "description": "Filtra por status da consulta. Valores aceitos: AGENDADA, ATUALIZADA, REALIZADA, CANCELADA. Requer role MEDICO, ENFERMEIRO ou ADMIN."
+            "description": "Busca o histórico de consultas pelo status. Requer role MEDICO, ENFERMEIRO ou ADMIN.\n\nStatus válidos: AGENDADA | CANCELADA | REALIZADA"
           }
         },
         {
-          "name": "buscarPorPeriodo",
+          "name": "📅 Buscar histórico por período",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
-              "mode": "graphql",
-              "graphql": {
-                "query": "query BuscarPorPeriodo($inicio: String!, $fim: String!, $page: Int, $size: Int) {\n  buscarPorPeriodo(inicio: $inicio, fim: $fim, page: $page, size: $size) {\n    id\n    consultaId\n    pacienteNome\n    pacienteCpf\n    medicoNome\n    especialidade\n    dataHora\n    status\n    dataEvento\n    dataDoRegistro\n  }\n}",
-                "variables": "{\n  \"inicio\": \"2026-01-01T00:00:00\",\n  \"fim\": \"2026-12-31T23:59:59\",\n  \"page\": 0,\n  \"size\": 10\n}"
-              }
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"{ buscarPorPeriodo(inicio: \\\"2026-01-01T00:00:00\\\", fim: \\\"2026-12-31T23:59:59\\\", page: 0, size: 10) { id consultaId pacienteNome pacienteCpf pacienteEmail medicoNome medicoCrm especialidade dataHora diagnostico tratamentoProposto demaisObservacoes status tipoEvento dataEvento dataDoRegistro } }\"\n}"
             },
             "url": {
               "raw": "{{baseUrlHistorico}}/graphql",
               "host": ["{{baseUrlHistorico}}"],
               "path": ["graphql"]
             },
-            "description": "Retorna consultas cujo dataEvento esteja no período informado. Formato: yyyy-MM-dd'T'HH:mm:ss. Requer role MEDICO, ENFERMEIRO ou ADMIN."
+            "description": "Busca o histórico de consultas dentro de um intervalo de datas. Requer role MEDICO, ENFERMEIRO ou ADMIN."
           }
         },
         {
-          "name": "minhasConsultas (PACIENTE)",
+          "name": "👤 Minhas consultas - histórico (paciente autenticado)",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
-              "mode": "graphql",
-              "graphql": {
-                "query": "query MinhasConsultas($page: Int, $size: Int) {\n  minhasConsultas(page: $page, size: $size) {\n    id\n    consultaId\n    pacienteNome\n    pacienteCpf\n    pacienteEmail\n    medicoNome\n    medicoCrm\n    especialidade\n    dataHora\n    status\n    dataEvento\n    dataDoRegistro\n  }\n}",
-                "variables": "{\n  \"page\": 0,\n  \"size\": 10\n}"
-              }
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"{ minhasConsultas(page: 0, size: 10) { id consultaId pacienteNome pacienteCpf pacienteEmail medicoNome medicoCrm especialidade dataHora status tipoEvento dataEvento dataDoRegistro } }\"\n}"
             },
             "url": {
               "raw": "{{baseUrlHistorico}}/graphql",
               "host": ["{{baseUrlHistorico}}"],
               "path": ["graphql"]
             },
-            "description": "Retorna as consultas do paciente autenticado (CPF extraído do JWT). Não expõe dados clínicos. Exclusivo para role PACIENTE."
+            "description": "Retorna o histórico de consultas do paciente autenticado (CPF extraído do token JWT). Requer role PACIENTE.\n\nRetorna HistoricoConsultaResumo (sem campos de diagnóstico/tratamento)."
           }
         },
         {
-          "name": "[AUDITORIA] auditoriaBuscarPorCpf",
+          "name": "🛡️ Auditoria - buscar por CPF",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
-              "mode": "graphql",
-              "graphql": {
-                "query": "query AuditoriaBuscarPorCpf($cpf: String!, $page: Int, $size: Int) {\n  auditoriaBuscarPorCpf(cpf: $cpf, page: $page, size: $size) {\n    id\n    consultaId\n    pacienteNome\n    pacienteCpf\n    medicoNome\n    especialidade\n    dataHora\n    status\n    diagnostico\n    tratamentoProposto\n    demaisObservacoes\n    dataEvento\n    dataDoRegistro\n  }\n}",
-                "variables": "{\n  \"cpf\": \"12345678901\",\n  \"page\": 0,\n  \"size\": 10\n}"
-              }
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"{ auditoriaBuscarPorCpf(cpf: \\\"12345678901\\\", page: 0, size: 10) { id consultaId pacienteNome pacienteCpf pacienteEmail medicoNome medicoCrm especialidade dataHora diagnostico tratamentoProposto demaisObservacoes status tipoEvento dataEvento dataDoRegistro } }\"\n}"
             },
             "url": {
               "raw": "{{baseUrlHistorico}}/graphql",
               "host": ["{{baseUrlHistorico}}"],
               "path": ["graphql"]
             },
-            "description": "Retorna o ciclo de vida COMPLETO de todas as consultas de um paciente (todos os eventos). Exclusivo para ADMIN."
+            "description": "Auditoria: busca todos os registros de histórico de um paciente pelo CPF, incluindo todos os eventos. Requer role ADMIN."
           }
         },
         {
-          "name": "[AUDITORIA] auditoriaBuscarPorPeriodo",
+          "name": "🛡️ Auditoria - buscar por período",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
-              "mode": "graphql",
-              "graphql": {
-                "query": "query AuditoriaBuscarPorPeriodo($inicio: String!, $fim: String!, $page: Int, $size: Int) {\n  auditoriaBuscarPorPeriodo(inicio: $inicio, fim: $fim, page: $page, size: $size) {\n    id\n    consultaId\n    pacienteNome\n    pacienteCpf\n    medicoNome\n    especialidade\n    dataHora\n    status\n    diagnostico\n    tratamentoProposto\n    demaisObservacoes\n    dataEvento\n    dataDoRegistro\n  }\n}",
-                "variables": "{\n  \"inicio\": \"2026-01-01T00:00:00\",\n  \"fim\": \"2026-12-31T23:59:59\",\n  \"page\": 0,\n  \"size\": 10\n}"
-              }
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"{ auditoriaBuscarPorPeriodo(inicio: \\\"2026-01-01T00:00:00\\\", fim: \\\"2026-12-31T23:59:59\\\", page: 0, size: 10) { id consultaId pacienteNome pacienteCpf pacienteEmail medicoNome medicoCrm especialidade dataHora diagnostico tratamentoProposto demaisObservacoes status tipoEvento dataEvento dataDoRegistro } }\"\n}"
             },
             "url": {
               "raw": "{{baseUrlHistorico}}/graphql",
               "host": ["{{baseUrlHistorico}}"],
               "path": ["graphql"]
             },
-            "description": "Retorna todos os eventos registrados no período, ordenados por consultaId e dataEvento. Exclusivo para ADMIN."
+            "description": "Auditoria: busca todos os registros de histórico dentro de um intervalo de datas. Requer role ADMIN."
           }
         },
         {
-          "name": "[AUDITORIA] auditoriaBuscarPorConsultaId",
+          "name": "🛡️ Auditoria - buscar por ID da consulta",
           "request": {
             "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
-              "mode": "graphql",
-              "graphql": {
-                "query": "query AuditoriaBuscarPorConsultaId($consultaId: ID!, $page: Int, $size: Int) {\n  auditoriaBuscarPorConsultaId(consultaId: $consultaId, page: $page, size: $size) {\n    id\n    consultaId\n    pacienteNome\n    pacienteCpf\n    medicoNome\n    especialidade\n    dataHora\n    status\n    diagnostico\n    tratamentoProposto\n    demaisObservacoes\n    dataEvento\n    dataDoRegistro\n  }\n}",
-                "variables": "{\n  \"consultaId\": 1,\n  \"page\": 0,\n  \"size\": 10\n}"
-              }
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"{ auditoriaBuscarPorConsultaId(consultaId: 1, page: 0, size: 10) { id consultaId pacienteNome pacienteCpf pacienteEmail medicoNome medicoCrm especialidade dataHora diagnostico tratamentoProposto demaisObservacoes status tipoEvento dataEvento dataDoRegistro } }\"\n}"
             },
             "url": {
               "raw": "{{baseUrlHistorico}}/graphql",
               "host": ["{{baseUrlHistorico}}"],
               "path": ["graphql"]
             },
-            "description": "Retorna o ciclo de vida COMPLETO de uma consulta específica (todos os eventos em ordem cronológica). Exclusivo para ADMIN."
+            "description": "Auditoria: busca todos os eventos de histórico de uma consulta específica pelo ID. Requer role ADMIN."
           }
         }
       ]

@@ -4,7 +4,7 @@
 **RM:** 368088
 **Curso:** Arquitetura e Desenvolvimento Java
 **Instituição:** Faculdade de Informática e Administração Paulista (FIAP)
-**Data:** 22 de Maio de 2026
+**Data:** 24 de Maio de 2026
 **Repositório:** [https://github.com/evandrosxavier/agende-me](https://github.com/evandrosxavier/agende-me)
 
 ---
@@ -827,13 +827,13 @@ query {
     medicoNome
     especialidade
     dataHora
+    diagnostico
+    tratamentoProposto
+    demaisObservacoes
     status
     tipoEvento
     dataEvento
     dataDoRegistro
-    diagnostico
-    tratamentoProposto
-    demaisObservacoes
   }
 }
 ```
